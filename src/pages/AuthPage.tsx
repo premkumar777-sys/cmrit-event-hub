@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,48 +6,83 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Form states
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signUpName, setSignUpName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    // Simulate authentication
-    setTimeout(() => {
-      setIsLoading(false);
+    const { error } = await signInWithGoogle();
+    if (error) {
       toast({
-        title: "Welcome!",
-        description: "You have successfully signed in.",
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
       });
-      navigate("/dashboard");
-    }, 1500);
+    }
+    setIsLoading(false);
   };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    
+    const { error } = await signInWithEmail(signInEmail, signInPassword);
+    
+    if (error) {
+      toast({
+        title: "Sign in failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
       toast({
         title: "Welcome!",
         description: "You have successfully signed in.",
       });
       navigate("/dashboard");
-    }, 1500);
+    }
+    setIsLoading(false);
   };
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    
+    const { error } = await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
+    
+    if (error) {
+      toast({
+        title: "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
       toast({
         title: "Account created!",
-        description: "Please check your email to verify your account.",
+        description: "You have been signed in automatically.",
       });
-    }, 1500);
+      navigate("/dashboard");
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -120,6 +155,8 @@ export default function AuthPage() {
                     id="email"
                     type="email"
                     placeholder="your.name@cmrit.ac.in"
+                    value={signInEmail}
+                    onChange={(e) => setSignInEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -129,6 +166,8 @@ export default function AuthPage() {
                     id="password"
                     type="password"
                     placeholder="••••••••"
+                    value={signInPassword}
+                    onChange={(e) => setSignInPassword(e.target.value)}
                     required
                   />
                 </div>
@@ -146,6 +185,8 @@ export default function AuthPage() {
                     id="name"
                     type="text"
                     placeholder="John Doe"
+                    value={signUpName}
+                    onChange={(e) => setSignUpName(e.target.value)}
                     required
                   />
                 </div>
@@ -155,6 +196,8 @@ export default function AuthPage() {
                     id="signup-email"
                     type="email"
                     placeholder="your.name@cmrit.ac.in"
+                    value={signUpEmail}
+                    onChange={(e) => setSignUpEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -164,6 +207,8 @@ export default function AuthPage() {
                     id="signup-password"
                     type="password"
                     placeholder="••••••••"
+                    value={signUpPassword}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
                     required
                   />
                 </div>
