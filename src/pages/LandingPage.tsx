@@ -53,18 +53,24 @@ const roles = [
     title: "Student",
     description: "Register for events, get certificates, and manage permissions.",
     color: "bg-role-student",
+    roleKey: "student",
+    emailHint: "RollNo@cmrithyderabad.edu.in",
   },
   {
     icon: Users,
     title: "Club Organizer",
     description: "Create events, manage registrations, and track attendance.",
     color: "bg-role-organizer",
+    roleKey: "organizer",
+    emailHint: "clubname@cmrithyderabad.edu.in",
   },
   {
     icon: BookOpen,
-    title: "Faculty / HoD",
+    title: "Faculty / HoD / Director",
     description: "Approve events and verify student permissions.",
     color: "bg-role-faculty",
+    roleKey: "faculty",
+    emailHint: "name@cmrithyderabad.edu.in",
   },
 ];
 
@@ -172,17 +178,22 @@ export default function LandingPage() {
               return (
                 <Card
                   key={role.title}
-                  className="text-center hover:shadow-google transition-all duration-300 animate-fade-in"
+                  className="text-center hover:shadow-google transition-all duration-300 animate-fade-in cursor-pointer group"
                   style={{ animationDelay: `${index * 100}ms` }}
+                  onClick={() => navigate(`/auth?role=${role.roleKey}`)}
                 >
                   <CardContent className="p-8">
                     <div
-                      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${role.color} text-white mb-4`}
+                      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${role.color} text-white mb-4 group-hover:scale-110 transition-transform`}
                     >
                       <Icon className="w-8 h-8" />
                     </div>
                     <h3 className="text-xl font-semibold mb-2">{role.title}</h3>
-                    <p className="text-muted-foreground">{role.description}</p>
+                    <p className="text-muted-foreground mb-3">{role.description}</p>
+                    <p className="text-xs text-muted-foreground/70 font-mono">{role.emailHint}</p>
+                    <Button variant="ghost" size="sm" className="mt-3 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Login / Sign Up <ArrowRight className="w-3 h-3" />
+                    </Button>
                   </CardContent>
                 </Card>
               );

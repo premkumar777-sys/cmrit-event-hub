@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,12 +7,60 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { GraduationCap, Users, BookOpen, ArrowLeft } from "lucide-react";
+
+type RoleType = "student" | "organizer" | "faculty";
+
+const roleConfig: Record<RoleType, {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  emailPattern: RegExp;
+  emailPlaceholder: string;
+  emailHint: string;
+  emailError: string;
+}> = {
+  student: {
+    title: "Student",
+    icon: GraduationCap,
+    color: "bg-role-student",
+    emailPattern: /^[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{4}@cmrithyderabad\.edu\.in$/,
+    emailPlaceholder: "22B81A0501@cmrithyderabad.edu.in",
+    emailHint: "Use your roll number (e.g., 22B81A0501@cmrithyderabad.edu.in)",
+    emailError: "Invalid student email. Format: RollNo@cmrithyderabad.edu.in",
+  },
+  organizer: {
+    title: "Club Organizer",
+    icon: Users,
+    color: "bg-role-organizer",
+    emailPattern: /^[a-zA-Z]+@cmrithyderabad\.edu\.in$/,
+    emailPlaceholder: "coding@cmrithyderabad.edu.in",
+    emailHint: "Use your club email (e.g., coding@cmrithyderabad.edu.in)",
+    emailError: "Invalid club email. Format: clubname@cmrithyderabad.edu.in",
+  },
+  faculty: {
+    title: "Faculty / HoD / Director",
+    icon: BookOpen,
+    color: "bg-role-faculty",
+    emailPattern: /^[a-zA-Z]+(\.[a-zA-Z]+)*@cmrithyderabad\.edu\.in$/,
+    emailPlaceholder: "john.doe@cmrithyderabad.edu.in",
+    emailHint: "Use your faculty email (e.g., name@cmrithyderabad.edu.in)",
+    emailError: "Invalid faculty email. Format: name@cmrithyderabad.edu.in",
+  },
+};
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Get role from URL params
+  const roleParam = searchParams.get("role") as RoleType | null;
+  const role: RoleType = roleParam && roleConfig[roleParam] ? roleParam : "student";
+  const config = roleConfig[role];
+  const Icon = config.icon;
   
   // Form states
   const [signInEmail, setSignInEmail] = useState("");
@@ -20,6 +68,7 @@ export default function AuthPage() {
   const [signUpName, setSignUpName] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
@@ -27,6 +76,23 @@ export default function AuthPage() {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  const validateEmail = (email: string): boolean => {
+    // Check domain first
+    if (!email.endsWith("@cmrithyderabad.edu.in")) {
+      setEmailError("Only @cmrithyderabad.edu.in emails are allowed");
+      return false;
+    }
+    
+    // Check role-specific pattern
+    if (!config.emailPattern.test(email)) {
+      setEmailError(config.emailError);
+      return false;
+    }
+    
+    setEmailError("");
+    return true;
+  };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -43,6 +109,16 @@ export default function AuthPage() {
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateEmail(signInEmail)) {
+      toast({
+        title: "Invalid email format",
+        description: emailError || config.emailError,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     const { error } = await signInWithEmail(signInEmail, signInPassword);
@@ -65,6 +141,16 @@ export default function AuthPage() {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateEmail(signUpEmail)) {
+      toast({
+        title: "Invalid email format",
+        description: emailError || config.emailError,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     
     const { error } = await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
@@ -91,14 +177,24 @@ export default function AuthPage() {
       
       <Card className="w-full max-w-md relative z-10 shadow-google animate-scale-in">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xl">
-              C
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-4 top-4"
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Back
+          </Button>
+          
+          <div className="flex items-center justify-center gap-2 mb-4 mt-4">
+            <div className={`flex items-center justify-center w-14 h-14 rounded-xl ${config.color} text-white`}>
+              <Icon className="w-7 h-7" />
             </div>
           </div>
-          <CardTitle className="text-2xl">Welcome to CMRIT Events</CardTitle>
+          <CardTitle className="text-2xl">{config.title} Login</CardTitle>
           <CardDescription>
-            Sign in with your college email to continue
+            {config.emailHint}
           </CardDescription>
         </CardHeader>
         
@@ -154,11 +250,17 @@ export default function AuthPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="your.name@cmrit.ac.in"
+                    placeholder={config.emailPlaceholder}
                     value={signInEmail}
-                    onChange={(e) => setSignInEmail(e.target.value)}
+                    onChange={(e) => {
+                      setSignInEmail(e.target.value);
+                      setEmailError("");
+                    }}
                     required
                   />
+                  {emailError && signInEmail && (
+                    <p className="text-xs text-destructive">{emailError}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
@@ -195,11 +297,18 @@ export default function AuthPage() {
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="your.name@cmrit.ac.in"
+                    placeholder={config.emailPlaceholder}
                     value={signUpEmail}
-                    onChange={(e) => setSignUpEmail(e.target.value)}
+                    onChange={(e) => {
+                      setSignUpEmail(e.target.value);
+                      setEmailError("");
+                    }}
                     required
                   />
+                  {emailError && signUpEmail && (
+                    <p className="text-xs text-destructive">{emailError}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">{config.emailHint}</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
@@ -210,6 +319,7 @@ export default function AuthPage() {
                     value={signUpPassword}
                     onChange={(e) => setSignUpPassword(e.target.value)}
                     required
+                    minLength={6}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
