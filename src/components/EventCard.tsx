@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Users, Clock } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, QrCode } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -18,6 +18,7 @@ interface EventCardProps {
   posterUrl?: string;
   onRegister?: () => void;
   onViewDetails?: () => void;
+  onViewTicket?: () => void;
   isRegistered?: boolean;
   showActions?: boolean;
   className?: string;
@@ -36,6 +37,7 @@ export function EventCard({
   posterUrl,
   onRegister,
   onViewDetails,
+  onViewTicket,
   isRegistered = false,
   showActions = true,
   className,
@@ -108,8 +110,9 @@ export function EventCard({
             </Button>
           )}
           {isRegistered && (
-            <Button variant="secondary" disabled className="flex-1">
-              ✓ Registered
+            <Button variant="secondary" onClick={onViewTicket} className="flex-1">
+              <QrCode className="w-4 h-4 mr-2" />
+              View Ticket
             </Button>
           )}
           <Button variant="outline" onClick={onViewDetails} className="flex-1">

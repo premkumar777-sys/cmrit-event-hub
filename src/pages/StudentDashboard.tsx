@@ -1,96 +1,181 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { EventCard } from "@/components/EventCard";
 import { DepartmentFilter } from "@/components/DepartmentFilter";
-import { Calendar, Award, CheckCircle, Clock } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { RegistrationTicketDialog } from "@/components/RegistrationTicketDialog";
+import { Calendar, Award, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useEventRegistration } from "@/hooks/useEventRegistration";
+import { supabase } from "@/integrations/supabase/client";
 
-const mockUser = {
-  name: "John Doe",
-  email: "john.doe@cmrit.ac.in",
-  role: "student" as const,
-};
+interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  date: string;
+  time: string | null;
+  venue: string | null;
+  department: string | null;
+  category: string | null;
+  status: "draft" | "pending" | "approved" | "rejected" | "completed";
+  max_participants: number | null;
+  poster_url: string | null;
+  organizer_id: string;
+}
 
-const mockEvents = [
-  {
-    id: "1",
-    title: "AI/ML Workshop: Building Smart Applications",
-    description: "Learn to build intelligent applications using TensorFlow and PyTorch. Hands-on session with real-world projects.",
-    date: "Jan 15, 2024",
-    time: "10:00 AM - 4:00 PM",
-    venue: "Seminar Hall A",
-    department: "CSE",
-    category: "Workshop",
-    status: "approved" as const,
-    registrations: 85,
-    posterUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400",
-  },
-  {
-    id: "2",
-    title: "Code Sprint 2024",
-    description: "24-hour competitive programming challenge. Form teams of 3 and solve algorithmic problems.",
-    date: "Jan 20, 2024",
-    time: "9:00 AM - 9:00 AM",
-    venue: "Computer Lab 1 & 2",
-    department: "CSM",
-    category: "Competition",
-    status: "approved" as const,
-    registrations: 120,
-    posterUrl: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400",
-  },
-  {
-    id: "3",
-    title: "IoT Innovation Summit",
-    description: "Explore the latest in Internet of Things technology. Guest speakers from leading tech companies.",
-    date: "Jan 25, 2024",
-    time: "2:00 PM - 6:00 PM",
-    venue: "Main Auditorium",
-    department: "ECE",
-    category: "Seminar",
-    status: "approved" as const,
-    registrations: 200,
-    posterUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400",
-  },
-  {
-    id: "4",
-    title: "Cloud Computing Bootcamp",
-    description: "Master AWS, Azure, and GCP fundamentals. Get certified and boost your career.",
-    date: "Feb 1, 2024",
-    time: "9:00 AM - 5:00 PM",
-    venue: "Conference Room B",
-    department: "CSD",
-    category: "Workshop",
-    status: "approved" as const,
-    registrations: 60,
-    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400",
-  },
-];
+interface OrganizerInfo {
+  [key: string]: string; // organizer_id -> organizer name/club name
+}
 
 export default function StudentDashboard() {
+  const { user } = useAuth();
+  const { registrations, loading: regLoading, registerForEvent, isRegistered } = useEventRegistration();
+  
+  const [events, setEvents] = useState<Event[]>([]);
+  const [organizerNames, setOrganizerNames] = useState<OrganizerInfo>({});
+  const [loading, setLoading] = useState(true);
   const [selectedDept, setSelectedDept] = useState("all");
-  const [registeredEvents, setRegisteredEvents] = useState<string[]>([]);
-  const { toast } = useToast();
+  const [ticketDialogOpen, setTicketDialogOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<{
+    id: string;
+    eventTitle: string;
+    eventDate: string;
+    eventTime: string;
+    eventVenue: string;
+    organizerName: string;
+    userName: string;
+    userEmail: string;
+  } | null>(null);
 
-  const filteredEvents = mockEvents.filter(
+  const [userProfile, setUserProfile] = useState<{ full_name: string; email: string } | null>(null);
+
+  // Fetch user profile
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", user.id)
+        .single();
+      setUserProfile(data);
+    };
+    fetchProfile();
+  }, [user]);
+
+  // Fetch approved events
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("events")
+          .select("*")
+          .in("status", ["approved", "completed"])
+          .order("date", { ascending: true });
+
+        if (error) throw error;
+        setEvents(data || []);
+
+        // Fetch organizer names for each event
+        const organizerIds = [...new Set(data?.map((e) => e.organizer_id) || [])];
+        if (organizerIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, full_name, email")
+            .in("id", organizerIds);
+
+          const names: OrganizerInfo = {};
+          profiles?.forEach((p) => {
+            // Extract club/organizer name from email or use full_name
+            const emailPrefix = p.email.split("@")[0];
+            names[p.id] = p.full_name || emailPrefix;
+          });
+          setOrganizerNames(names);
+        }
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Get registration counts for events
+  const [registrationCounts, setRegistrationCounts] = useState<{ [key: string]: number }>({});
+  
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (events.length === 0) return;
+      
+      const { data } = await supabase
+        .from("registrations")
+        .select("event_id");
+      
+      const counts: { [key: string]: number } = {};
+      data?.forEach((r) => {
+        counts[r.event_id] = (counts[r.event_id] || 0) + 1;
+      });
+      setRegistrationCounts(counts);
+    };
+    fetchCounts();
+  }, [events]);
+
+  const filteredEvents = events.filter(
     (event) => selectedDept === "all" || event.department === selectedDept
   );
 
-  const handleRegister = (eventId: string, eventTitle: string) => {
-    setRegisteredEvents([...registeredEvents, eventId]);
-    toast({
-      title: "Registration Successful!",
-      description: `You have registered for "${eventTitle}"`,
-    });
+  const handleRegister = async (event: Event) => {
+    const organizerName = organizerNames[event.organizer_id] || "Event Organizer";
+    const result = await registerForEvent(event, organizerName);
+    
+    if (result) {
+      // Show the ticket immediately after registration
+      setSelectedTicket(result);
+      setTicketDialogOpen(true);
+    }
   };
 
+  const handleViewTicket = (event: Event) => {
+    const registration = registrations.find((r) => r.event_id === event.id);
+    if (!registration) return;
+
+    const organizerName = organizerNames[event.organizer_id] || "Event Organizer";
+    
+    setSelectedTicket({
+      id: registration.id,
+      eventTitle: event.title,
+      eventDate: event.date,
+      eventTime: event.time || "",
+      eventVenue: event.venue || "",
+      organizerName,
+      userName: userProfile?.full_name || "Attendee",
+      userEmail: userProfile?.email || user?.email || "",
+    });
+    setTicketDialogOpen(true);
+  };
+
+  const userName = userProfile?.full_name || user?.email?.split("@")[0] || "Student";
+
+  if (loading || regLoading) {
+    return (
+      <DashboardLayout user={{ name: userName, email: user?.email || "", role: "student" }}>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
-    <DashboardLayout user={mockUser}>
+    <DashboardLayout user={{ name: userName, email: user?.email || "", role: "student" }}>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="animate-fade-in">
           <h1 className="text-2xl md:text-3xl font-bold">
-            Welcome back, {mockUser.name.split(" ")[0]}! 👋
+            Welcome back, {userName.split(" ")[0]}! 👋
           </h1>
           <p className="text-muted-foreground mt-1">
             Discover and register for upcoming events across departments.
@@ -101,22 +186,22 @@ export default function StudentDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
           <StatsCard
             title="Registered Events"
-            value={registeredEvents.length}
+            value={registrations.length}
             icon={Calendar}
           />
           <StatsCard
             title="Events Attended"
-            value={5}
+            value={0}
             icon={CheckCircle}
           />
           <StatsCard
             title="Certificates"
-            value={3}
+            value={0}
             icon={Award}
           />
           <StatsCard
             title="Upcoming"
-            value={2}
+            value={events.filter((e) => e.status === "approved").length}
             icon={Clock}
           />
         </div>
@@ -140,9 +225,20 @@ export default function StudentDashboard() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <EventCard
-                  {...event}
-                  isRegistered={registeredEvents.includes(event.id)}
-                  onRegister={() => handleRegister(event.id, event.title)}
+                  id={event.id}
+                  title={event.title}
+                  description={event.description || ""}
+                  date={event.date}
+                  time={event.time || "TBD"}
+                  venue={event.venue || "TBD"}
+                  department={event.department || "General"}
+                  category={event.category || "Event"}
+                  status={event.status}
+                  registrations={registrationCounts[event.id] || 0}
+                  posterUrl={event.poster_url || undefined}
+                  isRegistered={isRegistered(event.id)}
+                  onRegister={() => handleRegister(event)}
+                  onViewTicket={() => handleViewTicket(event)}
                   onViewDetails={() => {}}
                 />
               </div>
@@ -157,6 +253,12 @@ export default function StudentDashboard() {
           )}
         </div>
       </div>
+
+      <RegistrationTicketDialog
+        open={ticketDialogOpen}
+        onOpenChange={setTicketDialogOpen}
+        registration={selectedTicket}
+      />
     </DashboardLayout>
   );
 }
