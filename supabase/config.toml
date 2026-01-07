@@ -1,1 +1,4 @@
 project_id = "kkkcghmdgbcajxdxhkhm"
+
+[functions.generate-event-description]
+verify_jwt = false
