@@ -8,7 +8,7 @@ interface DashboardLayoutProps {
   user: {
     name: string;
     email: string;
-    role: "student" | "organizer" | "faculty" | "admin";
+    role: "student" | "organizer" | "faculty" | "hod" | "admin";
     avatar?: string;
   };
   onLogout?: () => void;

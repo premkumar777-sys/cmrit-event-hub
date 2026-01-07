@@ -15,7 +15,7 @@ interface HeaderProps {
   user?: {
     name: string;
     email: string;
-    role: "student" | "organizer" | "faculty" | "admin";
+    role: "student" | "organizer" | "faculty" | "hod" | "admin";
     avatar?: string;
   };
   onMenuClick?: () => void;
