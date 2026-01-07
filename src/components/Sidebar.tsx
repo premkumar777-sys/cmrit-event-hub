@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type RoleType = "student" | "organizer" | "faculty" | "admin";
+type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin";
 
 interface SidebarProps {
   role: RoleType;
@@ -33,7 +33,7 @@ const navItems: NavItem[] = [
     label: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["student", "organizer", "faculty", "admin"],
+    roles: ["student", "organizer", "faculty", "hod", "admin"],
   },
   {
     label: "Browse Events",
@@ -63,13 +63,13 @@ const navItems: NavItem[] = [
     label: "Approval Requests",
     href: "/approvals",
     icon: ClipboardCheck,
-    roles: ["faculty", "admin"],
+    roles: ["faculty", "hod", "admin"],
   },
   {
     label: "QR Scanner",
     href: "/scanner",
     icon: QrCode,
-    roles: ["organizer", "faculty"],
+    roles: ["organizer", "faculty", "hod"],
   },
   {
     label: "Certificates",
@@ -81,7 +81,7 @@ const navItems: NavItem[] = [
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,
-    roles: ["organizer", "faculty", "admin"],
+    roles: ["organizer", "faculty", "hod", "admin"],
   },
   {
     label: "Manage Users",
@@ -93,7 +93,7 @@ const navItems: NavItem[] = [
     label: "Settings",
     href: "/settings",
     icon: Settings,
-    roles: ["student", "organizer", "faculty", "admin"],
+    roles: ["student", "organizer", "faculty", "hod", "admin"],
   },
 ];
 

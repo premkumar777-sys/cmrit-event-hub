@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
-import { GraduationCap, Users, BookOpen, Shield } from "lucide-react";
+import { GraduationCap, Users, BookOpen, Shield, Crown } from "lucide-react";
 
-type RoleType = "student" | "organizer" | "faculty" | "admin";
+type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin";
 
 interface RoleBadgeProps {
   role: RoleType;
@@ -21,8 +21,13 @@ const roleConfig: Record<RoleType, { label: string; icon: React.ComponentType<{ 
     className: "bg-role-organizer/10 text-role-organizer border border-role-organizer/20",
   },
   faculty: {
-    label: "Faculty / HoD",
+    label: "Faculty",
     icon: BookOpen,
+    className: "bg-role-faculty/10 text-role-faculty border border-role-faculty/20",
+  },
+  hod: {
+    label: "HoD",
+    icon: Crown,
     className: "bg-role-faculty/10 text-role-faculty border border-role-faculty/20",
   },
   admin: {
