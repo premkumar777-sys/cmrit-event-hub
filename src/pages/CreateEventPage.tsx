@@ -13,8 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Upload, ArrowLeft, Send } from "lucide-react";
+import { Calendar, Upload, ArrowLeft, Send, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const mockUser = {
   name: "Sarah Johnson",
@@ -40,6 +41,48 @@ export default function CreateEventPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [department, setDepartment] = useState("");
+
+  const handleGenerateDescription = async () => {
+    if (!title.trim()) {
+      toast({
+        title: "Title Required",
+        description: "Please enter an event title first to generate a description.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-event-description', {
+        body: { title, category, department }
+      });
+
+      if (error) throw error;
+
+      if (data?.description) {
+        setDescription(data.description);
+        toast({
+          title: "Description Generated!",
+          description: "AI has created a description for your event. Feel free to edit it.",
+        });
+      }
+    } catch (error: any) {
+      console.error('Error generating description:', error);
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Could not generate description. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,24 +141,53 @@ export default function CreateEventPage() {
                 <Input
                   id="title"
                   placeholder="e.g., AI/ML Workshop: Building Smart Applications"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description *</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="description">Description *</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateDescription}
+                    disabled={isGenerating}
+                    className="gap-2 text-xs"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-3 h-3" />
+                        Generate with AI
+                      </>
+                    )}
+                  </Button>
+                </div>
                 <Textarea
                   id="description"
                   placeholder="Provide a detailed description of your event..."
                   rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  💡 Tip: Enter a title and click "Generate with AI" to auto-create a compelling description
+                </p>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Department *</Label>
-                  <Select required>
+                  <Select value={department} onValueChange={setDepartment} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
@@ -131,7 +203,7 @@ export default function CreateEventPage() {
 
                 <div className="space-y-2">
                   <Label>Category *</Label>
-                  <Select required>
+                  <Select value={category} onValueChange={setCategory} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
