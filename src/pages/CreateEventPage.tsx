@@ -16,14 +16,12 @@ import {
 import { Calendar, Upload, ArrowLeft, Send, Sparkles, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import type { Database } from "@/integrations/supabase/types";
 
-const mockUser = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@cmrit.ac.in",
-  role: "organizer" as const,
-};
+type Department = Database["public"]["Enums"]["department"];
 
-const departments = ["CSE", "CSM", "CSD", "ECE", "EEE", "MECH", "CIVIL"];
+const departments: Department[] = ["CSE", "CSM", "CSD", "ECE", "ISE", "ME", "CV"];
 const categories = ["Workshop", "Competition", "Seminar", "Cultural", "Sports", "Tech Talk"];
 const venues = [
   "Seminar Hall A",
@@ -40,12 +38,17 @@ const venues = [
 export default function CreateEventPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState<Department | "">("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [venue, setVenue] = useState("");
+  const [maxParticipants, setMaxParticipants] = useState("");
 
   const handleGenerateDescription = async () => {
     if (!title.trim()) {
@@ -86,28 +89,99 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create an event.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const { error } = await supabase.from("events").insert({
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        department: department as Department,
+        date,
+        time,
+        venue,
+        max_participants: parseInt(maxParticipants) || null,
+        organizer_id: user.id,
+        status: "pending",
+      });
+
+      if (error) throw error;
+
       toast({
         title: "Event Submitted!",
         description: "Your event has been submitted for approval.",
       });
       navigate("/my-events");
-    }, 1500);
+    } catch (error: any) {
+      console.error("Error creating event:", error);
+      toast({
+        title: "Submission Failed",
+        description: error.message || "Could not create event. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSaveDraft = () => {
-    toast({
-      title: "Draft Saved",
-      description: "Your event draft has been saved.",
-    });
+  const handleSaveDraft = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to save a draft.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from("events").insert({
+        title: title.trim() || "Untitled Event",
+        description: description.trim() || null,
+        category: category || null,
+        department: department as Department || null,
+        date: date || null,
+        time: time || null,
+        venue: venue || null,
+        max_participants: parseInt(maxParticipants) || null,
+        organizer_id: user.id,
+        status: "draft",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Draft Saved",
+        description: "Your event draft has been saved.",
+      });
+    } catch (error: any) {
+      console.error("Error saving draft:", error);
+      toast({
+        title: "Save Failed",
+        description: error.message || "Could not save draft. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
+
+  const userForLayout = user ? {
+    name: user.user_metadata?.full_name || user.email || "User",
+    email: user.email || "",
+    role: "organizer" as const,
+  } : { name: "Guest", email: "", role: "organizer" as const };
 
   return (
-    <DashboardLayout user={mockUser}>
+    <DashboardLayout user={userForLayout}>
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 animate-fade-in">
@@ -187,7 +261,7 @@ export default function CreateEventPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Department *</Label>
-                  <Select value={department} onValueChange={setDepartment} required>
+                  <Select value={department} onValueChange={(v) => setDepartment(v as Department)} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
@@ -236,6 +310,8 @@ export default function CreateEventPage() {
                     <Input
                       id="date"
                       type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
                       required
                     />
                     <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -247,6 +323,8 @@ export default function CreateEventPage() {
                   <Input
                     id="time"
                     type="time"
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
                     required
                   />
                 </div>
@@ -255,14 +333,14 @@ export default function CreateEventPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Venue *</Label>
-                  <Select required>
+                  <Select value={venue} onValueChange={(v) => setVenue(v)} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select venue" />
                     </SelectTrigger>
                     <SelectContent>
-                      {venues.map((venue) => (
-                        <SelectItem key={venue} value={venue}>
-                          {venue}
+                      {venues.map((v) => (
+                        <SelectItem key={v} value={v}>
+                          {v}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -276,6 +354,8 @@ export default function CreateEventPage() {
                     type="number"
                     placeholder="50"
                     min={1}
+                    value={maxParticipants}
+                    onChange={(e) => setMaxParticipants(e.target.value)}
                     required
                   />
                 </div>
