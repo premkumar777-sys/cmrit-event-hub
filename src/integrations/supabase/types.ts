@@ -46,6 +46,56 @@ export type Database = {
           },
         ]
       }
+      canteen_orders: {
+        Row: {
+          collected_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          order_number: string
+          qr_code: string | null
+          status: string
+          student_id: string
+          time_slot_id: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_number: string
+          qr_code?: string | null
+          status?: string
+          student_id: string
+          time_slot_id: string
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          collected_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_number?: string
+          qr_code?: string | null
+          status?: string
+          student_id?: string
+          time_slot_id?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "canteen_orders_time_slot_id_fkey"
+            columns: ["time_slot_id"]
+            isOneToOne: false
+            referencedRelation: "time_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           certificate_url: string | null
@@ -137,6 +187,122 @@ export type Database = {
           venue?: string | null
         }
         Relationships: []
+      }
+      menu_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean
+          name: string
+          preparation_time_minutes: number | null
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          name: string
+          preparation_time_minutes?: number | null
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean
+          name?: string
+          preparation_time_minutes?: number | null
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          menu_item_id: string
+          order_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          menu_item_id: string
+          order_id: string
+          quantity?: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          menu_item_id?: string
+          order_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "canteen_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_logs: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          order_id: string
+          status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id: string
+          status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          order_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "canteen_orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permission_requests: {
         Row: {
@@ -244,6 +410,42 @@ export type Database = {
           },
         ]
       }
+      time_slots: {
+        Row: {
+          capacity: number
+          created_at: string
+          current_orders: number
+          end_time: string
+          id: string
+          is_active: boolean
+          slot_date: string
+          slot_time: string
+          start_time: string
+        }
+        Insert: {
+          capacity?: number
+          created_at?: string
+          current_orders?: number
+          end_time: string
+          id?: string
+          is_active?: boolean
+          slot_date?: string
+          slot_time: string
+          start_time: string
+        }
+        Update: {
+          capacity?: number
+          created_at?: string
+          current_orders?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          slot_date?: string
+          slot_time?: string
+          start_time?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -274,10 +476,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_canteen_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "student" | "organizer" | "faculty" | "hod" | "admin"
+      app_role:
+        | "student"
+        | "organizer"
+        | "faculty"
+        | "hod"
+        | "admin"
+        | "canteen_admin"
       department: "CSM" | "CSE" | "ECE" | "CSD" | "ISE" | "ME" | "CV"
       event_status: "draft" | "pending" | "approved" | "rejected" | "completed"
     }
@@ -407,7 +616,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["student", "organizer", "faculty", "hod", "admin"],
+      app_role: [
+        "student",
+        "organizer",
+        "faculty",
+        "hod",
+        "admin",
+        "canteen_admin",
+      ],
       department: ["CSM", "CSE", "ECE", "CSD", "ISE", "ME", "CV"],
       event_status: ["draft", "pending", "approved", "rejected", "completed"],
     },
