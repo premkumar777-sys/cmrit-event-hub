@@ -8,6 +8,7 @@ import {
   BookOpen,
   Palette,
   Eye,
+  HandHeart,
   LucideIcon,
 } from "lucide-react";
 
@@ -22,6 +23,7 @@ export interface Club {
   category: string;
   email: string;
   foundedYear: number;
+  logoUrl?: string;
   socialLinks?: {
     instagram?: string;
     linkedin?: string;
@@ -33,7 +35,7 @@ export const clubs: Club[] = [
   {
     id: "hsga",
     name: "HSGA",
-    fullName: "Humanities & Social Good Association",
+    fullName: "Hindustan Scouts & Guides Association",
     description: "Dedicated to promoting social awareness, humanitarian efforts, and community service initiatives. We organize drives, awareness campaigns, and social impact events.",
     icon: Heart,
     color: "text-rose-500",
@@ -41,6 +43,7 @@ export const clubs: Club[] = [
     category: "Social",
     email: "hsga@cmrithyderabad.edu.in",
     foundedYear: 2019,
+    logoUrl: "/logos/hsga.png",
   },
   {
     id: "nss",
@@ -53,6 +56,7 @@ export const clubs: Club[] = [
     category: "Service",
     email: "nss@cmrithyderabad.edu.in",
     foundedYear: 2015,
+    logoUrl: "/logos/nss.png",
   },
   {
     id: "prompt-techies",
@@ -65,6 +69,7 @@ export const clubs: Club[] = [
     category: "Technical",
     email: "coding@cmrithyderabad.edu.in",
     foundedYear: 2022,
+    logoUrl: "/logos/prompt-techies.png",
   },
   {
     id: "gdg",
@@ -77,6 +82,20 @@ export const clubs: Club[] = [
     category: "Technical",
     email: "gdsc@cmrithyderabad.edu.in",
     foundedYear: 2020,
+    logoUrl: "/logos/gdg.png",
+  },
+  {
+    id: "streetcause",
+    name: "Street Cause",
+    fullName: "Street Cause - We Care",
+    description: "A student-run NGO focused on social welfare and community development. We organize fundraisers, awareness campaigns, and volunteer drives to help the underprivileged.",
+    icon: HandHeart,
+    color: "text-sky-500",
+    bgColor: "bg-sky-500",
+    category: "Service",
+    email: "streetcause@cmrithyderabad.edu.in",
+    foundedYear: 2018,
+    logoUrl: "/logos/streetcause.png",
   },
   {
     id: "dance-club",
@@ -147,3 +166,4 @@ export const getClubById = (id: string): Club | undefined => {
 export const getClubsByCategory = (category: string): Club[] => {
   return clubs.filter((club) => club.category === category);
 };
+

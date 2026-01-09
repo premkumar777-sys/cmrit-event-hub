@@ -167,8 +167,12 @@ export default function ClubPage() {
           </Button>
 
           <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm">
-              <Icon className="w-10 h-10" />
+            <div className="flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm overflow-hidden">
+              {club.logoUrl ? (
+                <img src={club.logoUrl} alt={club.name} className="w-full h-full object-contain p-2" />
+              ) : (
+                <Icon className="w-10 h-10" />
+              )}
             </div>
             <div className="flex-1">
               <Badge variant="secondary" className="mb-2 bg-white/20 text-white border-0">
@@ -342,8 +346,12 @@ export default function ClubPage() {
                         className="w-full justify-start gap-3"
                         onClick={() => navigate(`/clubs/${otherClub.id}`)}
                       >
-                        <div className={`p-1.5 rounded-lg ${otherClub.bgColor}`}>
-                          <OtherIcon className="w-4 h-4 text-white" />
+                        <div className={`p-1.5 rounded-lg ${otherClub.logoUrl ? 'bg-white' : otherClub.bgColor} overflow-hidden`}>
+                          {otherClub.logoUrl ? (
+                            <img src={otherClub.logoUrl} alt={otherClub.name} className="w-4 h-4 object-contain" />
+                          ) : (
+                            <OtherIcon className="w-4 h-4 text-white" />
+                          )}
                         </div>
                         <span className="truncate">{otherClub.name}</span>
                       </Button>

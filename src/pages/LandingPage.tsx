@@ -95,17 +95,17 @@ export default function LandingPage() {
                 <p className="text-xs text-muted-foreground">Powered by Google</p>
               </div>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
               Smart Event &{" "}
               <span className="text-primary">Approval System</span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl animate-slide-up">
               Digitize event approvals, registrations, attendance, and certificates.
               No more classroom disturbances or cabin visits.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up">
               <Button
                 size="lg"
@@ -138,7 +138,7 @@ export default function LandingPage() {
               A complete solution for managing college events from proposal to certificate.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => {
               const Icon = feature.icon;
@@ -173,7 +173,7 @@ export default function LandingPage() {
               Join vibrant communities and participate in exciting events organized by our official clubs.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
             {clubs.map((club, index) => {
               const Icon = club.icon;
@@ -186,9 +186,17 @@ export default function LandingPage() {
                 >
                   <CardContent className="p-4 text-center">
                     <div
-                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${club.bgColor} text-white mb-3 group-hover:scale-110 transition-transform`}
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${club.logoUrl ? 'bg-white' : club.bgColor} text-white mb-3 group-hover:scale-110 transition-transform overflow-hidden`}
                     >
-                      <Icon className="w-6 h-6" />
+                      {club.logoUrl ? (
+                        <img
+                          src={club.logoUrl}
+                          alt={club.name}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <Icon className="w-6 h-6" />
+                      )}
                     </div>
                     <h3 className="font-semibold text-sm mb-1">{club.name}</h3>
                     <p className="text-xs text-muted-foreground line-clamp-1">{club.fullName}</p>
@@ -200,7 +208,7 @@ export default function LandingPage() {
               );
             })}
           </div>
-          
+
           <div className="text-center mt-8">
             <Button
               variant="outline"
@@ -226,7 +234,7 @@ export default function LandingPage() {
               Role-based access ensures the right tools for the right people.
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {roles.map((role, index) => {
               const Icon = role.icon;
