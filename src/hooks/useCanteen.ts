@@ -125,6 +125,61 @@ export function useCanteen() {
     loadData();
   }, [user]);
 
+  // Real-time subscription for order status updates
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('canteen-orders-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'canteen_orders',
+          filter: `student_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updatedOrder = payload.new as CanteenOrder;
+          const oldOrder = payload.old as CanteenOrder;
+
+          // Update local state
+          setOrders((prev) =>
+            prev.map((order) =>
+              order.id === updatedOrder.id
+                ? { ...order, ...updatedOrder }
+                : order
+            )
+          );
+
+          // Show toast notification for status changes
+          if (oldOrder.status !== updatedOrder.status) {
+            if (updatedOrder.status === 'ready') {
+              toast({
+                title: "🍽️ Order Ready!",
+                description: `Your order ${updatedOrder.order_number} is ready for pickup!`,
+              });
+            } else if (updatedOrder.status === 'preparing') {
+              toast({
+                title: "👨‍🍳 Order Being Prepared",
+                description: `Your order ${updatedOrder.order_number} is being prepared.`,
+              });
+            } else if (updatedOrder.status === 'collected') {
+              toast({
+                title: "✅ Order Collected",
+                description: `Order ${updatedOrder.order_number} has been collected. Enjoy!`,
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, toast]);
+
   const addToCart = (item: MenuItem) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.id === item.id);
