@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute, DashboardRedirect } from "@/components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -29,26 +30,105 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/dashboard" element={<StudentDashboard />} />
-            <Route path="/events" element={<StudentDashboard />} />
-            <Route path="/registrations" element={<StudentDashboard />} />
-            <Route path="/certificates" element={<CertificatesPage />} />
-            <Route path="/organizer" element={<OrganizerDashboard />} />
-            <Route path="/my-events" element={<OrganizerDashboard />} />
-            <Route path="/create-event" element={<CreateEventPage />} />
-            <Route path="/scanner" element={<QRScannerPage />} />
-            <Route path="/faculty" element={<FacultyDashboard />} />
-            <Route path="/approvals" element={<FacultyDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/analytics" element={<AdminDashboard />} />
-            <Route path="/users" element={<AdminDashboard />} />
-            <Route path="/settings" element={<StudentDashboard />} />
-            <Route path="/canteen" element={<CanteenMenuPage />} />
-            <Route path="/canteen/admin" element={<CanteenAdminPage />} />
-            <Route path="/canteen/scanner" element={<CanteenScannerPage />} />
             <Route path="/clubs/:clubId" element={<ClubPage />} />
+
+            {/* Smart Dashboard Redirect - redirects based on role */}
+            <Route path="/dashboard" element={<DashboardRedirect />} />
+
+            {/* Student Routes */}
+            <Route path="/events" element={
+              <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/registrations" element={
+              <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/certificates" element={
+              <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
+                <CertificatesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/canteen" element={
+              <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
+                <CanteenMenuPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <StudentDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Organizer Routes */}
+            <Route path="/organizer" element={
+              <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
+                <OrganizerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-events" element={
+              <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
+                <OrganizerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/create-event" element={
+              <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
+                <CreateEventPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/scanner" element={
+              <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
+                <QRScannerPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Faculty/HOD Routes */}
+            <Route path="/faculty" element={
+              <ProtectedRoute allowedRoles={['faculty', 'hod', 'admin']}>
+                <FacultyDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/approvals" element={
+              <ProtectedRoute allowedRoles={['faculty', 'hod', 'admin']}>
+                <FacultyDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/users" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Canteen Admin Routes */}
+            <Route path="/canteen/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <CanteenAdminPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/canteen/scanner" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <CanteenScannerPage />
+              </ProtectedRoute>
+            } />
+
+            {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
@@ -58,3 +138,4 @@ const App = () => (
 );
 
 export default App;
+

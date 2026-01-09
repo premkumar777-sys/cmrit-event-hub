@@ -25,9 +25,9 @@ import { format, formatDistanceToNow } from "date-fns";
 export default function FacultyDashboard() {
   const { user } = useAuth();
   const { primaryRole } = useUserRole();
-  const { pendingEvents, loading: eventsLoading, approveEvent, rejectEvent } = useEventApprovals();
+  const { pendingEvents, loading: eventsLoading, approveEvent, rejectEvent, userApprovalLevel } = useEventApprovals();
   const { requests, loading: requestsLoading, grantPermission, denyPermission } = usePermissionRequests();
-  
+
   const [selectedEvent, setSelectedEvent] = useState<PendingEvent | null>(null);
   const [comments, setComments] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -73,6 +73,20 @@ export default function FacultyDashboard() {
       return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
     } catch {
       return '';
+    }
+  };
+
+  // Get approval level display info
+  const getApprovalLevelInfo = (level: string) => {
+    switch (level) {
+      case 'pending_faculty':
+        return { label: 'Faculty Review', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' };
+      case 'pending_hod':
+        return { label: 'HOD Review', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' };
+      case 'pending_director':
+        return { label: 'Director Review', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300' };
+      default:
+        return { label: 'Pending', color: 'bg-yellow-100 text-yellow-800' };
     }
   };
 
@@ -145,8 +159,21 @@ export default function FacultyDashboard() {
                           by {event.organizer.full_name || event.organizer.email}
                         </p>
                       </div>
-                      <StatusBadge status="pending" />
+                      <Badge className={getApprovalLevelInfo(event.approval_level).color}>
+                        {getApprovalLevelInfo(event.approval_level).label}
+                      </Badge>
                     </div>
+
+                    {/* Approval Chain Progress */}
+                    <div className="flex items-center gap-1 mb-3">
+                      <div className={`w-2 h-2 rounded-full ${event.approved_by_faculty ? 'bg-green-500' : event.approval_level === 'pending_faculty' ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300'}`} />
+                      <div className="w-8 h-0.5 bg-gray-300" />
+                      <div className={`w-2 h-2 rounded-full ${event.approved_by_hod ? 'bg-green-500' : event.approval_level === 'pending_hod' ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300'}`} />
+                      <div className="w-8 h-0.5 bg-gray-300" />
+                      <div className={`w-2 h-2 rounded-full ${event.approval_level === 'approved' ? 'bg-green-500' : event.approval_level === 'pending_director' ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300'}`} />
+                      <span className="text-xs text-muted-foreground ml-2">Faculty → HOD → Director</span>
+                    </div>
+
                     <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />

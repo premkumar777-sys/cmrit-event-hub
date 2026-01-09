@@ -108,6 +108,7 @@ export const clubs: Club[] = [
     category: "Cultural",
     email: "dance@cmrithyderabad.edu.in",
     foundedYear: 2016,
+    logoUrl: "/logos/dance-club.jpg",
   },
   {
     id: "singing-club",
@@ -120,6 +121,7 @@ export const clubs: Club[] = [
     category: "Cultural",
     email: "music@cmrithyderabad.edu.in",
     foundedYear: 2016,
+    logoUrl: "/logos/singing-club.png",
   },
   {
     id: "agastya",
@@ -132,6 +134,7 @@ export const clubs: Club[] = [
     category: "Literary",
     email: "literary@cmrithyderabad.edu.in",
     foundedYear: 2017,
+    logoUrl: "/logos/agastya.png",
   },
   {
     id: "fine-arts-club",
@@ -144,6 +147,7 @@ export const clubs: Club[] = [
     category: "Cultural",
     email: "cultural@cmrithyderabad.edu.in",
     foundedYear: 2016,
+    logoUrl: "/logos/fine-arts-club.png",
   },
   {
     id: "ikshana-club",
@@ -156,6 +160,7 @@ export const clubs: Club[] = [
     category: "Creative",
     email: "photography@cmrithyderabad.edu.in",
     foundedYear: 2018,
+    logoUrl: "/logos/ikshana.jpg",
   },
 ];
 
