@@ -8,6 +8,8 @@ import { CartSheet } from "@/components/canteen/CartSheet";
 import { OrderCard } from "@/components/canteen/OrderCard";
 import { useCanteen } from "@/hooks/useCanteen";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const categories = [
   { id: "all", label: "All", icon: Utensils },
@@ -19,6 +21,8 @@ const categories = [
 ];
 
 export default function CanteenMenuPage() {
+  const { user, signOut } = useAuth();
+  const { primaryRole } = useUserRole();
   const {
     menuItems,
     timeSlots,
@@ -35,6 +39,13 @@ export default function CanteenMenuPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
 
+  const dashboardUser = {
+    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User",
+    email: user?.email || "",
+    role: primaryRole as "student" | "organizer" | "faculty" | "hod" | "admin",
+    avatar: user?.user_metadata?.avatar_url,
+  };
+
   const filteredItems = menuItems.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === "all" || item.category === category;
@@ -46,7 +57,7 @@ export default function CanteenMenuPage() {
   );
 
   return (
-    <DashboardLayout role="student">
+    <DashboardLayout user={dashboardUser} onLogout={signOut}>
       <div className="space-y-6">
         {/* Header */}
         <div>

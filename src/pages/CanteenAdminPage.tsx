@@ -24,6 +24,7 @@ import {
 import { useCanteenAdmin } from "@/hooks/useCanteenAdmin";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
@@ -35,6 +36,7 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 
 export default function CanteenAdminPage() {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const {
     orders,
     loading,
@@ -45,6 +47,13 @@ export default function CanteenAdminPage() {
   } = useCanteenAdmin();
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const dashboardUser = {
+    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Canteen Admin",
+    email: user?.email || "",
+    role: "admin" as const,
+    avatar: user?.user_metadata?.avatar_url,
+  };
 
   const stats = getOrderStats();
   const itemDemand = getItemDemand();
@@ -82,7 +91,7 @@ export default function CanteenAdminPage() {
   );
 
   return (
-    <DashboardLayout role="canteen_admin">
+    <DashboardLayout user={dashboardUser} onLogout={signOut}>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
