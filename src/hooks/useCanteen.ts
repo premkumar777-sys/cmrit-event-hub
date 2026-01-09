@@ -74,7 +74,32 @@ export function useCanteen() {
       return;
     }
 
-    setMenuItems(data || []);
+    // Resolve image URLs: if the stored value is already an absolute URL, use it.
+    // Otherwise assume it's a path in Supabase Storage and attempt to build a public URL.
+    const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "public";
+    const resolved = await Promise.all(
+      (data || []).map(async (item: any) => {
+        const image = item.image_url;
+        if (!image) return item;
+        // If it's already an absolute URL, keep it
+        if (typeof image === "string" && image.startsWith("http")) {
+          return item;
+        }
+
+        try {
+          const { data: urlData } = await supabase.storage.from(bucket).getPublicUrl(image);
+          // supabase client returns an object with publicUrl in data (v2)
+          const publicUrl = (urlData && (urlData as any).publicUrl) || (urlData as any)?.public_url || null;
+          return { ...item, image_url: publicUrl || image };
+        } catch (e) {
+          // If anything goes wrong, leave the original value so placeholder will show
+          console.error("Error resolving storage url for", image, e);
+          return item;
+        }
+      })
+    );
+
+    setMenuItems(resolved || []);
   };
 
   const fetchTimeSlots = async () => {

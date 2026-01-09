@@ -17,6 +17,7 @@ const roleDashboardMap: Record<AppRole, string> = {
     'faculty': '/faculty',
     'hod': '/faculty',
     'admin': '/admin',
+    'canteen_admin': '/canteen/admin',
 };
 
 export function ProtectedRoute({

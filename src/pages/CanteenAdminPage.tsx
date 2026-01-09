@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCanteenAdmin } from "@/hooks/useCanteenAdmin";
+import MenuManager from "./MenuManager";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -140,6 +141,7 @@ export default function CanteenAdminPage() {
         <Tabs defaultValue="orders">
           <TabsList>
             <TabsTrigger value="orders">Live Orders</TabsTrigger>
+            <TabsTrigger value="menu">Menu</TabsTrigger>
             <TabsTrigger value="demand">Item Demand</TabsTrigger>
             <TabsTrigger value="slots">Slot Analysis</TabsTrigger>
           </TabsList>
@@ -258,6 +260,23 @@ export default function CanteenAdminPage() {
                 })}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="menu" className="space-y-4">
+            {/* Menu management: list items and allow image upload */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ChefHat className="h-5 w-5" />
+                  Manage Menu Items
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* This component requires canteen admin hook to expose menuItems and upload helper */}
+                {/* Lazy-load menu items from hook by calling refreshData from useCanteenAdmin if needed */}
+                <MenuManager />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="demand" className="space-y-4">

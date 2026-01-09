@@ -119,12 +119,12 @@ const App = () => (
 
             {/* Canteen Admin Routes */}
             <Route path="/canteen/admin" element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
                 <CanteenAdminPage />
               </ProtectedRoute>
             } />
             <Route path="/canteen/scanner" element={
-              <ProtectedRoute allowedRoles={['admin']}>
+              <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
                 <CanteenScannerPage />
               </ProtectedRoute>
             } />

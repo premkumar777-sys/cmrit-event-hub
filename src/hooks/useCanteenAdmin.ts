@@ -155,6 +155,36 @@ export function useCanteenAdmin() {
     return true;
   };
 
+  const uploadMenuItemImage = async (id: string, file: File) => {
+    const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "public";
+    const path = `menu-items/${id}-${file.name}`;
+
+    // Upload file
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucket)
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      return false;
+    }
+
+    // Save the storage path in the DB (store relative path)
+    const { error: updateError } = await supabase
+      .from("menu_items")
+      .update({ image_url: path })
+      .eq("id", id);
+
+    if (updateError) {
+      toast({ title: "Error", description: "Failed to update menu item with image", variant: "destructive" });
+      return false;
+    }
+
+    toast({ title: "Uploaded", description: "Image uploaded and linked to item" });
+    await fetchMenuItems();
+    return true;
+  };
+
   const updateMenuItem = async (id: string, updates: Partial<MenuItem>) => {
     const { error } = await supabase
       .from("menu_items")
@@ -233,6 +263,7 @@ export function useCanteenAdmin() {
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
+    uploadMenuItemImage,
     getOrderStats,
     getItemDemand,
     getSlotDistribution,

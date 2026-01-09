@@ -1,4 +1,4 @@
-import { Plus, Minus } from "lucide-react";
+import { Plus, Minus, Image as ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,23 @@ export function MenuItemCard({ item, cartItem, onAdd, onRemove }: MenuItemCardPr
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <CardContent className="p-4">
         <div className="flex justify-between items-start gap-3">
+          {/* Image */}
+          <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted-foreground/10 flex items-center justify-center">
+            {item.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={item.image_url}
+                alt={item.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-muted-foreground">
+                <ImageIcon className="h-6 w-6" />
+                <span className="text-xs mt-1 text-center px-1 line-clamp-2">{item.name}</span>
+              </div>
+            )}
+          </div>
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-medium text-foreground truncate">{item.name}</h3>
