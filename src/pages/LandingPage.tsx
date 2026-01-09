@@ -107,8 +107,8 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl shadow-google">
-                C
+              <div className="flex items-center justify-center w-14 h-14 rounded-2xl overflow-hidden shadow-google">
+                <img src="/logos/logo.jpg" alt="CMRIT Logo" className="w-full h-full object-cover" />
               </div>
               <div className="text-left">
                 <h2 className="text-xl font-bold text-foreground">CMRIT Events</h2>
