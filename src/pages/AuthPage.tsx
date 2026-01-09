@@ -24,9 +24,9 @@ const roleConfig: Record<RoleType, {
     title: "Student",
     icon: GraduationCap,
     color: "bg-role-student",
-    emailPattern: /^[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{4}@cmrithyderabad\.edu\.in$/,
-    emailPlaceholder: "22B81A0501@cmrithyderabad.edu.in",
-    emailHint: "Use your roll number (e.g., 22B81A0501@cmrithyderabad.edu.in)",
+    emailPattern: /^[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]@cmrithyderabad\.edu\.in$/i,
+    emailPlaceholder: "24R01A66T7@cmrithyderabad.edu.in",
+    emailHint: "Use your roll number (e.g., 24R01A66T7@cmrithyderabad.edu.in)",
     emailError: "Invalid student email. Format: RollNo@cmrithyderabad.edu.in",
   },
   organizer: {
@@ -34,18 +34,18 @@ const roleConfig: Record<RoleType, {
     icon: Users,
     color: "bg-role-organizer",
     emailPattern: /^[a-zA-Z]+@cmrithyderabad\.edu\.in$/,
-    emailPlaceholder: "coding@cmrithyderabad.edu.in",
-    emailHint: "Use your club email (e.g., coding@cmrithyderabad.edu.in)",
+    emailPlaceholder: "clubname@cmrithyderabad.edu.in",
+    emailHint: "Use your club email (e.g., clubname@cmrithyderabad.edu.in)",
     emailError: "Invalid club email. Format: clubname@cmrithyderabad.edu.in",
   },
   faculty: {
     title: "Faculty / HoD / Director",
     icon: BookOpen,
     color: "bg-role-faculty",
-    emailPattern: /^[a-zA-Z]+(\.[a-zA-Z]+)*@cmrithyderabad\.edu\.in$/,
-    emailPlaceholder: "john.doe@cmrithyderabad.edu.in",
-    emailHint: "Use your faculty email (e.g., name@cmrithyderabad.edu.in)",
-    emailError: "Invalid faculty email. Format: name@cmrithyderabad.edu.in",
+    emailPattern: /^[a-zA-Z]+(\.[a-zA-Z]+)*@cmrithyderabad\.ac\.in$/,
+    emailPlaceholder: "john.doe@cmrithyderabad.ac.in",
+    emailHint: "Use your faculty email (e.g., name@cmrithyderabad.ac.in)",
+    emailError: "Invalid faculty email. Format: name@cmrithyderabad.ac.in",
   },
 };
 
@@ -55,13 +55,13 @@ export default function AuthPage() {
   const { toast } = useToast();
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Get role from URL params
   const roleParam = searchParams.get("role") as RoleType | null;
   const role: RoleType = roleParam && roleConfig[roleParam] ? roleParam : "student";
   const config = roleConfig[role];
   const Icon = config.icon;
-  
+
   // Form states
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
@@ -83,13 +83,13 @@ export default function AuthPage() {
       setEmailError("Only @cmrithyderabad.edu.in emails are allowed");
       return false;
     }
-    
+
     // Check role-specific pattern
     if (!config.emailPattern.test(email)) {
       setEmailError(config.emailError);
       return false;
     }
-    
+
     setEmailError("");
     return true;
   };
@@ -109,7 +109,7 @@ export default function AuthPage() {
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateEmail(signInEmail)) {
       toast({
         title: "Invalid email format",
@@ -118,11 +118,11 @@ export default function AuthPage() {
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     const { error } = await signInWithEmail(signInEmail, signInPassword);
-    
+
     if (error) {
       toast({
         title: "Sign in failed",
@@ -141,7 +141,7 @@ export default function AuthPage() {
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateEmail(signUpEmail)) {
       toast({
         title: "Invalid email format",
@@ -150,11 +150,11 @@ export default function AuthPage() {
       });
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     const { error } = await signUpWithEmail(signUpEmail, signUpPassword, signUpName);
-    
+
     if (error) {
       toast({
         title: "Sign up failed",
@@ -174,7 +174,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="absolute inset-0 hero-gradient opacity-5" />
-      
+
       <Card className="w-full max-w-md relative z-10 shadow-google animate-scale-in">
         <CardHeader className="text-center">
           <Button
@@ -186,7 +186,7 @@ export default function AuthPage() {
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back
           </Button>
-          
+
           <div className="flex items-center justify-center gap-2 mb-4 mt-4">
             <div className={`flex items-center justify-center w-14 h-14 rounded-xl ${config.color} text-white`}>
               <Icon className="w-7 h-7" />
@@ -197,7 +197,7 @@ export default function AuthPage() {
             {config.emailHint}
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <Button
             variant="outline"
@@ -242,7 +242,7 @@ export default function AuthPage() {
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="signin">
               <form onSubmit={handleEmailSignIn} className="space-y-4">
                 <div className="space-y-2">
@@ -278,7 +278,7 @@ export default function AuthPage() {
                 </Button>
               </form>
             </TabsContent>
-            
+
             <TabsContent value="signup">
               <form onSubmit={handleEmailSignUp} className="space-y-4">
                 <div className="space-y-2">
