@@ -13,6 +13,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreateEventPage from "./pages/CreateEventPage";
 import QRScannerPage from "./pages/QRScannerPage";
 import CertificatesPage from "./pages/CertificatesPage";
+import CanteenMenuPage from "./pages/CanteenMenuPage";
+import CanteenAdminPage from "./pages/CanteenAdminPage";
+import CanteenScannerPage from "./pages/CanteenScannerPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +44,9 @@ const App = () => (
             <Route path="/analytics" element={<AdminDashboard />} />
             <Route path="/users" element={<AdminDashboard />} />
             <Route path="/settings" element={<StudentDashboard />} />
+            <Route path="/canteen" element={<CanteenMenuPage />} />
+            <Route path="/canteen/admin" element={<CanteenAdminPage />} />
+            <Route path="/canteen/scanner" element={<CanteenScannerPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
