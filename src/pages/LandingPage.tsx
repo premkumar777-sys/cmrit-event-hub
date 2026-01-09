@@ -86,6 +86,14 @@ export default function LandingPage() {
   const { toast } = useToast();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  const scrollToRoles = () => {
+    const el = document.getElementById("roles");
+    if (!el) return;
+    const offset = 72; // adjust if there is a fixed header
+    const top = el.getBoundingClientRect().top + window.pageYOffset - offset;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
+
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     const { error } = await signInWithGoogle();
@@ -106,14 +114,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 hero-gradient opacity-5" />
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl shadow-google">
-                C
+            <div className="flex flex-col items-center gap-2 mb-6">
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img src="logos/cmr-logo.jpg" alt="CMRIT Logo" className="w-20 h-20 object-contain" />
               </div>
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-foreground">CMRIT Events</h2>
-                <p className="text-xs text-muted-foreground">Powered by Google</p>
-              </div>
+              <h2 className="text-2xl font-bold text-foreground">CMRIT Events</h2>
+              <p className="text-xs text-muted-foreground">Powered by Google</p>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
@@ -128,18 +134,19 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up">
               <Button
+                type="button"
                 size="lg"
-                onClick={() => navigate("/auth")}
+                onClick={scrollToRoles}
                 className="gap-2 shadow-google"
               >
                 Get Started
                 <ArrowRight className="w-4 h-4" />
               </Button>
               <Button
+                type="button"
                 size="lg"
                 variant="outline"
-                onClick={handleGoogleSignIn}
-                disabled={isGoogleLoading}
+                onClick={() => navigate("/auth?role=student")}
                 className="gap-2"
               >
                 {isGoogleLoading ? (
@@ -256,7 +263,7 @@ export default function LandingPage() {
       </section>
 
       {/* Roles Section */}
-      <section className="py-16 md:py-24">
+      <section id="roles" className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
