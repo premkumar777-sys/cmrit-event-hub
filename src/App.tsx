@@ -16,6 +16,7 @@ import CertificatesPage from "./pages/CertificatesPage";
 import CanteenMenuPage from "./pages/CanteenMenuPage";
 import CanteenAdminPage from "./pages/CanteenAdminPage";
 import CanteenScannerPage from "./pages/CanteenScannerPage";
+import ClubPage from "./pages/ClubPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/canteen" element={<CanteenMenuPage />} />
             <Route path="/canteen/admin" element={<CanteenAdminPage />} />
             <Route path="/canteen/scanner" element={<CanteenScannerPage />} />
+            <Route path="/clubs/:clubId" element={<ClubPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
