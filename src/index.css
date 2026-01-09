@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Google+Sans:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Google-inspired color palette */
+    --background: 0 0% 98%;
+    --foreground: 220 13% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 13% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 13% 18%;
+
+    /* Google Blue */
+    --primary: 217 89% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Light gray for secondary */
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 13% 18%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
+
+    --accent: 217 89% 96%;
+    --accent-foreground: 217 89% 45%;
+
+    /* Google Red for destructive */
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 89% 61%;
+
+    --radius: 0.75rem;
+
+    /* Status colors */
+    --status-pending: 43 96% 56%;
+    --status-pending-foreground: 43 96% 20%;
+    --status-approved: 142 71% 45%;
+    --status-approved-foreground: 0 0% 100%;
+    --status-rejected: 4 90% 58%;
+    --status-rejected-foreground: 0 0% 100%;
+    --status-completed: 217 89% 61%;
+    --status-completed-foreground: 0 0% 100%;
+    --status-draft: 220 8% 46%;
+    --status-draft-foreground: 0 0% 100%;
+
+    /* Role colors */
+    --role-student: 217 89% 61%;
+    --role-organizer: 262 83% 58%;
+    --role-faculty: 142 71% 45%;
+    --role-admin: 4 90% 58%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(217 89% 61%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(220 14% 98%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-elevated: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 13% 10%;
+    --foreground: 0 0% 95%;
+
+    --card: 220 13% 13%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 220 13% 13%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 217 89% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 13% 18%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 220 13% 18%;
+    --muted-foreground: 220 8% 65%;
+
+    --accent: 217 89% 20%;
+    --accent-foreground: 217 89% 75%;
+
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --ring: 217 89% 61%;
+
+    --sidebar-background: 220 13% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 217 89% 61%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 13% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 13% 20%;
+    --sidebar-ring: 217 89% 61%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border/50 shadow-card;
+  }
+
+  .status-chip {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-pending {
+    background-color: hsl(var(--status-pending) / 0.15);
+    color: hsl(var(--status-pending-foreground));
+    border: 1px solid hsl(var(--status-pending) / 0.3);
+  }
+
+  .status-approved {
+    background-color: hsl(var(--status-approved));
+    color: hsl(var(--status-approved-foreground));
+  }
+
+  .status-rejected {
+    background-color: hsl(var(--status-rejected));
+    color: hsl(var(--status-rejected-foreground));
+  }
+
+  .status-completed {
+    background-color: hsl(var(--status-completed));
+    color: hsl(var(--status-completed-foreground));
+  }
+
+  .status-draft {
+    background-color: hsl(var(--status-draft));
+    color: hsl(var(--status-draft-foreground));
+  }
+
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+
+  .google-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .google-shadow-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .google-shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}

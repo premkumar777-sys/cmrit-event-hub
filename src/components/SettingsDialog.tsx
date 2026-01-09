@@ -1,0 +1,102 @@
+import React, { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+
+type ThemePref = "light" | "dark" | "system";
+
+const STORAGE_KEY = "cmrit_theme_pref";
+
+function applyTheme(pref: ThemePref) {
+  const root = document.documentElement;
+
+  const setDark = (isDark: boolean) => {
+    if (isDark) root.classList.add("dark");
+    else root.classList.remove("dark");
+  };
+
+  if (pref === "system") {
+    const isDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setDark(isDark);
+  } else if (pref === "dark") {
+    setDark(true);
+  } else {
+    setDark(false);
+  }
+}
+
+export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const [theme, setTheme] = useState<ThemePref>("system");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY) as ThemePref | null;
+      const initial = stored || "system";
+      setTheme(initial);
+      applyTheme(initial);
+    } catch (e) {
+      setTheme("system");
+      applyTheme("system");
+    }
+  }, []);
+
+  useEffect(() => {
+    applyTheme(theme);
+    try {
+      if (theme === "system") localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, theme);
+    } catch (_) {}
+  }, [theme]);
+
+  useEffect(() => {
+    // Listen for system theme changes when using system
+    const mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = () => {
+      if (theme === "system") applyTheme("system");
+    };
+    mq?.addEventListener?.("change", handler);
+    return () => mq?.removeEventListener?.("change", handler);
+  }, [theme]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Settings</DialogTitle>
+          <DialogDescription>Customize your preferences</DialogDescription>
+        </DialogHeader>
+
+        <div className="mt-4 space-y-4">
+          <div>
+            <p className="text-sm font-medium">Theme</p>
+            <p className="text-xs text-muted-foreground mb-2">Choose light, dark or follow system</p>
+            <ToggleGroup type="single" value={theme} onValueChange={(v) => v && setTheme(v as ThemePref)} className="mt-2">
+              <ToggleGroupItem value="light">Light</ToggleGroupItem>
+              <ToggleGroupItem value="dark">Dark</ToggleGroupItem>
+              <ToggleGroupItem value="system">System</ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)} className="mr-2">
+            Close
+          </Button>
+          <Button onClick={() => onOpenChange(false)}>Save</Button>
+        </DialogFooter>
+
+        <DialogClose />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default SettingsDialog;
