@@ -102,12 +102,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-<<<<<<< HEAD
-        <div className="absolute inset-0 hero-gradient opacity-5" />
-=======
+            <section className="relative overflow-hidden">
         <div className="absolute inset-0 hero-gradient opacity-5 pointer-events-none" />
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
             <div className="flex items-center gap-2 mb-6">

@@ -8,10 +8,7 @@ import { ProtectedRoute, DashboardRedirect } from "@/components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
 import StudentDashboard from "./pages/StudentDashboard";
-<<<<<<< HEAD
 import SettingsPage from "./pages/SettingsPage";
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import FacultyDashboard from "./pages/FacultyDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -65,11 +62,7 @@ const App = () => (
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
-<<<<<<< HEAD
                 <SettingsPage />
-=======
-                <StudentDashboard />
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
               </ProtectedRoute>
             } />
 
@@ -126,20 +119,12 @@ const App = () => (
 
             {/* Canteen Admin Routes */}
             <Route path="/canteen/admin" element={
-<<<<<<< HEAD
               <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
-=======
-              <ProtectedRoute allowedRoles={['admin']}>
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
                 <CanteenAdminPage />
               </ProtectedRoute>
             } />
             <Route path="/canteen/scanner" element={
-<<<<<<< HEAD
               <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
-=======
-              <ProtectedRoute allowedRoles={['admin']}>
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
                 <CanteenScannerPage />
               </ProtectedRoute>
             } />

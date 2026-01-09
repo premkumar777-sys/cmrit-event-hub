@@ -1,8 +1,5 @@
 import { Bell, Menu, User, LogOut } from "lucide-react";
-<<<<<<< HEAD
 import { useState } from "react";
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,10 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RoleBadge } from "@/components/ui/role-badge";
-<<<<<<< HEAD
 import SettingsDialog from "@/components/SettingsDialog";
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 import { cn } from "@/lib/utils";
 
 interface HeaderProps {
@@ -39,10 +33,7 @@ export function Header({
   notificationCount = 0,
   className,
 }: HeaderProps) {
-<<<<<<< HEAD
   const [settingsOpen, setSettingsOpen] = useState(false);
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
   return (
     <header
       className={cn(
@@ -99,11 +90,7 @@ export function Header({
                   </div>
                 </Button>
               </DropdownMenuTrigger>
-<<<<<<< HEAD
-                <DropdownMenuContent align="end" className="w-56">
-=======
               <DropdownMenuContent align="end" className="w-56">
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
                 <DropdownMenuLabel>
                   <div className="flex flex-col gap-2">
                     <div>
@@ -114,11 +101,7 @@ export function Header({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-<<<<<<< HEAD
                 <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
-=======
-                <DropdownMenuItem>
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
                   <User className="mr-2 h-4 w-4" />
                   Profile Settings
                 </DropdownMenuItem>
@@ -130,10 +113,7 @@ export function Header({
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-<<<<<<< HEAD
           <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
         </div>
       </div>
     </header>

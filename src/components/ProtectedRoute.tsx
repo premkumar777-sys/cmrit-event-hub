@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -104,7 +103,6 @@ export function DashboardRedirect() {
         </div>
     );
 }
-=======
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -209,4 +207,4 @@ export function DashboardRedirect() {
         </div>
     );
 }
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
+

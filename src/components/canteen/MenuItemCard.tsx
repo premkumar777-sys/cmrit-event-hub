@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { Plus, Minus, Image as ImageIcon } from "lucide-react";
-=======
-import { Plus, Minus } from "lucide-react";
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +26,6 @@ export function MenuItemCard({ item, cartItem, onAdd, onRemove }: MenuItemCardPr
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <CardContent className="p-4">
         <div className="flex justify-between items-start gap-3">
-<<<<<<< HEAD
           {/* Image */}
           <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-muted-foreground/10 flex items-center justify-center">
             {item.image_url ? (
@@ -47,9 +42,6 @@ export function MenuItemCard({ item, cartItem, onAdd, onRemove }: MenuItemCardPr
               </div>
             )}
           </div>
-
-=======
->>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-medium text-foreground truncate">{item.name}</h3>
