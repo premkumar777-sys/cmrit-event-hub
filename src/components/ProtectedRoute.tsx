@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 
 // Map roles to their default dashboard routes
 const roleDashboardMap: Record<AppRole, string> = {
-    'student': '/dashboard',
+    'student': '/events',
     'organizer': '/organizer',
     'faculty': '/faculty',
     'hod': '/faculty',
