@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   ClipboardCheck,
@@ -12,6 +13,15 @@ import {
   GraduationCap,
   Users,
   BookOpen,
+  Sparkles,
+  Heart,
+  Music,
+  Palette,
+  Code,
+  Globe,
+  Mic2,
+  Rocket,
+  Eye,
 } from "lucide-react";
 
 const features = [
@@ -44,6 +54,72 @@ const features = [
     icon: Shield,
     title: "75% Attendance Rule",
     description: "Automatic permission validation based on attendance records.",
+  },
+];
+
+const clubs = [
+  {
+    name: "HSGA",
+    fullName: "Humanities & Social Good Association",
+    icon: Heart,
+    color: "bg-rose-500",
+    category: "Social",
+  },
+  {
+    name: "NSS",
+    fullName: "National Service Scheme",
+    icon: Globe,
+    color: "bg-emerald-500",
+    category: "Service",
+  },
+  {
+    name: "Prompt Techies",
+    fullName: "AI & Tech Innovation Club",
+    icon: Code,
+    color: "bg-blue-500",
+    category: "Technical",
+  },
+  {
+    name: "GDG",
+    fullName: "Google Developer Group",
+    icon: Rocket,
+    color: "bg-yellow-500",
+    category: "Technical",
+  },
+  {
+    name: "Dance Club",
+    fullName: "Rhythm & Moves",
+    icon: Sparkles,
+    color: "bg-purple-500",
+    category: "Cultural",
+  },
+  {
+    name: "Singing Club",
+    fullName: "Vocal Harmony",
+    icon: Mic2,
+    color: "bg-pink-500",
+    category: "Cultural",
+  },
+  {
+    name: "Agastya",
+    fullName: "Literary & Debate Society",
+    icon: BookOpen,
+    color: "bg-indigo-500",
+    category: "Literary",
+  },
+  {
+    name: "Fine Arts Club",
+    fullName: "Creative Arts & Design",
+    icon: Palette,
+    color: "bg-orange-500",
+    category: "Cultural",
+  },
+  {
+    name: "Ikshana Club",
+    fullName: "Photography & Visual Arts",
+    icon: Eye,
+    color: "bg-cyan-500",
+    category: "Creative",
   },
 ];
 
@@ -156,6 +232,59 @@ export default function LandingPage() {
                 </Card>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Clubs Discovery Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Discover Campus Clubs
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Join vibrant communities and participate in exciting events organized by our official clubs.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+            {clubs.map((club, index) => {
+              const Icon = club.icon;
+              return (
+                <Card
+                  key={club.name}
+                  className="group hover:shadow-google transition-all duration-300 animate-fade-in cursor-pointer hover:-translate-y-1"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => navigate("/auth")}
+                >
+                  <CardContent className="p-4 text-center">
+                    <div
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${club.color} text-white mb-3 group-hover:scale-110 transition-transform`}
+                    >
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-semibold text-sm mb-1">{club.name}</h3>
+                    <p className="text-xs text-muted-foreground line-clamp-1">{club.fullName}</p>
+                    <Badge variant="secondary" className="mt-2 text-xs">
+                      {club.category}
+                    </Badge>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          
+          <div className="text-center mt-8">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate("/auth")}
+              className="gap-2"
+            >
+              Explore All Events
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </section>
