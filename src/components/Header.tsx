@@ -49,11 +49,8 @@ export function Header({
         </Button>
         
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground font-bold text-lg">
-            C
-          </div>
-          <div className="hidden sm:flex items-center justify-center w-8 h-8 rounded-xl overflow-hidden">
-            <img src="/logos/logo.jpg" alt="CMRIT logo" className="w-full h-full object-cover" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl overflow-hidden">
+            <img src="/logos/cmrit-logo.png" alt="CMRIT" className="w-full h-full object-cover" />
           </div>
           <div className="hidden sm:block">
             <h1 className="text-lg font-semibold leading-none">CMRIT Events</h1>
