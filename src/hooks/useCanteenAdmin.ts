@@ -155,6 +155,7 @@ export function useCanteenAdmin() {
     return true;
   };
 
+<<<<<<< HEAD
   const uploadMenuItemImage = async (id: string, file: File) => {
     const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "public";
     const path = `menu-items/${id}-${file.name}`;
@@ -185,6 +186,8 @@ export function useCanteenAdmin() {
     return true;
   };
 
+=======
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
   const updateMenuItem = async (id: string, updates: Partial<MenuItem>) => {
     const { error } = await supabase
       .from("menu_items")
@@ -263,7 +266,10 @@ export function useCanteenAdmin() {
     addMenuItem,
     updateMenuItem,
     deleteMenuItem,
+<<<<<<< HEAD
     uploadMenuItemImage,
+=======
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
     getOrderStats,
     getItemDemand,
     getSlotDistribution,

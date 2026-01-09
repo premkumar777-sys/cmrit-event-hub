@@ -74,6 +74,7 @@ export function useCanteen() {
       return;
     }
 
+<<<<<<< HEAD
     // Resolve image URLs: if the stored value is already an absolute URL, use it.
     // Otherwise assume it's a path in Supabase Storage and attempt to build a public URL.
     const bucket = import.meta.env.VITE_SUPABASE_STORAGE_BUCKET || "public";
@@ -100,6 +101,9 @@ export function useCanteen() {
     );
 
     setMenuItems(resolved || []);
+=======
+    setMenuItems(data || []);
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
   };
 
   const fetchTimeSlots = async () => {

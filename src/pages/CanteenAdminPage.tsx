@@ -22,7 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCanteenAdmin } from "@/hooks/useCanteenAdmin";
+<<<<<<< HEAD
 import MenuManager from "./MenuManager";
+=======
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -141,7 +144,10 @@ export default function CanteenAdminPage() {
         <Tabs defaultValue="orders">
           <TabsList>
             <TabsTrigger value="orders">Live Orders</TabsTrigger>
+<<<<<<< HEAD
             <TabsTrigger value="menu">Menu</TabsTrigger>
+=======
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
             <TabsTrigger value="demand">Item Demand</TabsTrigger>
             <TabsTrigger value="slots">Slot Analysis</TabsTrigger>
           </TabsList>
@@ -262,6 +268,7 @@ export default function CanteenAdminPage() {
             )}
           </TabsContent>
 
+<<<<<<< HEAD
           <TabsContent value="menu" className="space-y-4">
             {/* Menu management: list items and allow image upload */}
             <Card>
@@ -279,6 +286,8 @@ export default function CanteenAdminPage() {
             </Card>
           </TabsContent>
 
+=======
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
           <TabsContent value="demand" className="space-y-4">
             <Card>
               <CardHeader>

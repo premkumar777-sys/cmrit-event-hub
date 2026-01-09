@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
+<<<<<<< HEAD
 export type AppRole = 'student' | 'organizer' | 'faculty' | 'hod' | 'admin' | 'canteen_admin';
+=======
+export type AppRole = 'student' | 'organizer' | 'faculty' | 'hod' | 'admin';
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
 
 export function useUserRole() {
   const { user } = useAuth();
@@ -33,7 +37,11 @@ export function useUserRole() {
         setRoles(userRoles.length > 0 ? userRoles : ['student']);
         
         // Determine primary role (highest privilege)
+<<<<<<< HEAD
         const rolePriority: AppRole[] = ['admin', 'canteen_admin', 'hod', 'faculty', 'organizer', 'student'];
+=======
+        const rolePriority: AppRole[] = ['admin', 'hod', 'faculty', 'organizer', 'student'];
+>>>>>>> 009278d72cd8bfc750d2f5053db3b4a8a41dbbe4
         const primary = rolePriority.find(role => userRoles.includes(role)) || 'student';
         setPrimaryRole(primary);
       }
