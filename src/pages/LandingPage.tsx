@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { clubs } from "@/data/clubs";
 import {
   Calendar,
   ClipboardCheck,
@@ -13,15 +14,6 @@ import {
   GraduationCap,
   Users,
   BookOpen,
-  Sparkles,
-  Heart,
-  Music,
-  Palette,
-  Code,
-  Globe,
-  Mic2,
-  Rocket,
-  Eye,
 } from "lucide-react";
 
 const features = [
@@ -54,72 +46,6 @@ const features = [
     icon: Shield,
     title: "75% Attendance Rule",
     description: "Automatic permission validation based on attendance records.",
-  },
-];
-
-const clubs = [
-  {
-    name: "HSGA",
-    fullName: "Humanities & Social Good Association",
-    icon: Heart,
-    color: "bg-rose-500",
-    category: "Social",
-  },
-  {
-    name: "NSS",
-    fullName: "National Service Scheme",
-    icon: Globe,
-    color: "bg-emerald-500",
-    category: "Service",
-  },
-  {
-    name: "Prompt Techies",
-    fullName: "AI & Tech Innovation Club",
-    icon: Code,
-    color: "bg-blue-500",
-    category: "Technical",
-  },
-  {
-    name: "GDG",
-    fullName: "Google Developer Group",
-    icon: Rocket,
-    color: "bg-yellow-500",
-    category: "Technical",
-  },
-  {
-    name: "Dance Club",
-    fullName: "Rhythm & Moves",
-    icon: Sparkles,
-    color: "bg-purple-500",
-    category: "Cultural",
-  },
-  {
-    name: "Singing Club",
-    fullName: "Vocal Harmony",
-    icon: Mic2,
-    color: "bg-pink-500",
-    category: "Cultural",
-  },
-  {
-    name: "Agastya",
-    fullName: "Literary & Debate Society",
-    icon: BookOpen,
-    color: "bg-indigo-500",
-    category: "Literary",
-  },
-  {
-    name: "Fine Arts Club",
-    fullName: "Creative Arts & Design",
-    icon: Palette,
-    color: "bg-orange-500",
-    category: "Cultural",
-  },
-  {
-    name: "Ikshana Club",
-    fullName: "Photography & Visual Arts",
-    icon: Eye,
-    color: "bg-cyan-500",
-    category: "Creative",
   },
 ];
 
@@ -253,14 +179,14 @@ export default function LandingPage() {
               const Icon = club.icon;
               return (
                 <Card
-                  key={club.name}
+                  key={club.id}
                   className="group hover:shadow-google transition-all duration-300 animate-fade-in cursor-pointer hover:-translate-y-1"
                   style={{ animationDelay: `${index * 50}ms` }}
-                  onClick={() => navigate("/auth")}
+                  onClick={() => navigate(`/clubs/${club.id}`)}
                 >
                   <CardContent className="p-4 text-center">
                     <div
-                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${club.color} text-white mb-3 group-hover:scale-110 transition-transform`}
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl ${club.bgColor} text-white mb-3 group-hover:scale-110 transition-transform`}
                     >
                       <Icon className="w-6 h-6" />
                     </div>
