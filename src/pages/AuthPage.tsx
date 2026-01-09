@@ -15,37 +15,29 @@ const roleConfig: Record<RoleType, {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
-  emailPattern: RegExp;
   emailPlaceholder: string;
   emailHint: string;
-  emailError: string;
 }> = {
   student: {
     title: "Student",
     icon: GraduationCap,
     color: "bg-role-student",
-    emailPattern: /^[0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]{2}[A-Za-z][0-9]@cmrithyderabad\.edu\.in$/i,
-    emailPlaceholder: "24R01A66T7@cmrithyderabad.edu.in",
-    emailHint: "Use your roll number (e.g., 24R01A66T7@cmrithyderabad.edu.in)",
-    emailError: "Invalid student email. Format: RollNo@cmrithyderabad.edu.in",
+    emailPlaceholder: "your.email@example.com",
+    emailHint: "Enter your email address",
   },
   organizer: {
     title: "Club Organizer",
     icon: Users,
     color: "bg-role-organizer",
-    emailPattern: /^[a-zA-Z]+@cmrithyderabad\.edu\.in$/,
-    emailPlaceholder: "clubname@cmrithyderabad.edu.in",
-    emailHint: "Use your club email (e.g., clubname@cmrithyderabad.edu.in)",
-    emailError: "Invalid club email. Format: clubname@cmrithyderabad.edu.in",
+    emailPlaceholder: "club@example.com",
+    emailHint: "Enter your club email",
   },
   faculty: {
     title: "Faculty / HoD / Director",
     icon: BookOpen,
     color: "bg-role-faculty",
-    emailPattern: /^[a-zA-Z]+(\.[a-zA-Z]+)*@cmrithyderabad\.ac\.in$/,
-    emailPlaceholder: "john.doe@cmrithyderabad.ac.in",
-    emailHint: "Use your faculty email (e.g., name@cmrithyderabad.ac.in)",
-    emailError: "Invalid faculty email. Format: name@cmrithyderabad.ac.in",
+    emailPlaceholder: "faculty@example.com",
+    emailHint: "Enter your faculty email",
   },
 };
 
@@ -78,18 +70,11 @@ export default function AuthPage() {
   }, [user, navigate]);
 
   const validateEmail = (email: string): boolean => {
-    // Check domain first
-    if (!email.endsWith("@cmrithyderabad.edu.in")) {
-      setEmailError("Only @cmrithyderabad.edu.in emails are allowed");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
       return false;
     }
-
-    // Check role-specific pattern
-    if (!config.emailPattern.test(email)) {
-      setEmailError(config.emailError);
-      return false;
-    }
-
     setEmailError("");
     return true;
   };
