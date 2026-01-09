@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCanteenAdmin } from "@/hooks/useCanteenAdmin";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ScanResult {
   success: boolean;
@@ -19,11 +20,19 @@ interface ScanResult {
 }
 
 export default function CanteenScannerPage() {
+  const { user, signOut } = useAuth();
   const { orders, updateOrderStatus } = useCanteenAdmin();
   const { toast } = useToast();
   const [manualCode, setManualCode] = useState("");
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const dashboardUser = {
+    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Canteen Admin",
+    email: user?.email || "",
+    role: "admin" as const,
+    avatar: user?.user_metadata?.avatar_url,
+  };
 
   const processOrder = async (orderNumber: string) => {
     setIsProcessing(true);
@@ -115,7 +124,7 @@ export default function CanteenScannerPage() {
   const readyOrders = orders.filter((o) => o.status === "ready");
 
   return (
-    <DashboardLayout role="canteen_admin">
+    <DashboardLayout user={dashboardUser} onLogout={signOut}>
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div>
