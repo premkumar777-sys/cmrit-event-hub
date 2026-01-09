@@ -10,10 +10,13 @@ import {
   Settings,
   Plus,
   FileText,
+  Utensils,
+  ChefHat,
+  ScanLine,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin";
+type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin" | "canteen_admin";
 
 interface SidebarProps {
   role: RoleType;
@@ -78,6 +81,12 @@ const navItems: NavItem[] = [
     roles: ["student"],
   },
   {
+    label: "Canteen",
+    href: "/canteen",
+    icon: Utensils,
+    roles: ["student"],
+  },
+  {
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,
@@ -93,7 +102,19 @@ const navItems: NavItem[] = [
     label: "Settings",
     href: "/settings",
     icon: Settings,
-    roles: ["student", "organizer", "faculty", "hod", "admin"],
+    roles: ["student", "organizer", "faculty", "hod", "admin", "canteen_admin"],
+  },
+  {
+    label: "Order Dashboard",
+    href: "/canteen/admin",
+    icon: ChefHat,
+    roles: ["canteen_admin"],
+  },
+  {
+    label: "QR Scanner",
+    href: "/canteen/scanner",
+    icon: ScanLine,
+    roles: ["canteen_admin"],
   },
 ];
 
