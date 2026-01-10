@@ -33,12 +33,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const welcomeSentKey = `welcome_email_sent_${session.user.id}`;
           const alreadySent = localStorage.getItem(welcomeSentKey);
 
+          console.log('Auth event:', event, 'Already sent:', alreadySent);
+
           if (!alreadySent) {
             const userName = session.user.user_metadata?.full_name ||
               session.user.email?.split('@')[0] ||
               'User';
-            await sendWelcomeEmail(session.user.email!, userName);
-            localStorage.setItem(welcomeSentKey, 'true');
+            console.log('Sending welcome email to:', session.user.email, userName);
+            try {
+              const result = await sendWelcomeEmail(session.user.email!, userName);
+              console.log('Email result:', result);
+              localStorage.setItem(welcomeSentKey, 'true');
+            } catch (err) {
+              console.error('Email send error:', err);
+            }
           }
         }
       }
