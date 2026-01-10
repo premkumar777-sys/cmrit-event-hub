@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { getClubById, clubs } from "@/data/clubs";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import {
   Mail,
   Clock,
   CalendarDays,
+  MapPin,
 } from "lucide-react";
 
 interface Event {
@@ -50,7 +51,23 @@ export default function ClubPage() {
     totalRegistrations: 0,
   });
 
+  const location = useLocation();
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
   const club = clubId ? getClubById(clubId) : null;
+
+  const handleRegister = (event: Event) => {
+    const externalUrl = (event as any).register_url as string | undefined;
+    if (externalUrl) {
+      window.open(externalUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+    navigate("/auth");
+  };
+
+  const handleViewDetailsLocal = (event: Event) => {
+    setSelectedEvent(event);
+  };
 
   useEffect(() => {
     if (!club) return;
@@ -76,7 +93,74 @@ export default function ClubPage() {
             .order("date", { ascending: false })
             .limit(10);
 
-          setEvents((eventsByCategory as Event[]) || []);
+          // Start with events found by category
+          let clubEvents = (eventsByCategory as Event[]) || [];
+
+          // In development, also merge any seed events explicitly for this club (Fine Arts or GDG)
+          if (process.env.NODE_ENV === "development") {
+            try {
+              const seedModule = await import("@/data/seedEvents");
+              const seedEvents = seedModule.seedEvents || [];
+              const matchingSeed = seedEvents.filter((s: any) => (s.organizer_id === "seed:fine-arts" && club.id === "fine-arts-club") || (s.organizer_id === "seed:gdg" && club.id === "gdg"));
+
+              const existingIds = new Set(clubEvents.map((e) => e.id));
+              const seedAsEvents = matchingSeed.map((s: any) => ({
+                id: s.id,
+                title: s.title,
+                description: s.description,
+                date: s.date,
+                time: s.time || null,
+                venue: s.venue,
+                department: s.department || null,
+                category: s.category || null,
+                status: s.status as any,
+                poster_url: s.poster_url || null,
+                organizer_id: s.organizer_id,
+              }));
+
+              clubEvents = [...seedAsEvents.filter((s) => !existingIds.has(s.id)), ...clubEvents];
+            } catch (e) {
+              // ignore
+            }
+          }
+
+          // Set events and compute stats & registration counts same as organizer branch
+          setEvents(clubEvents);
+
+          // If the page was opened with an eventId in state (e.g., from the seed event), show it
+          const eventIdFromState = (location.state as any)?.eventId;
+          if (eventIdFromState) {
+            const found = clubEvents.find((e) => e.id === eventIdFromState);
+            if (found) setSelectedEvent(found);
+          }
+
+          const today = new Date().toISOString().split("T")[0];
+          const upcoming = clubEvents.filter((e) => e.date >= today && e.status === "approved");
+          const completed = clubEvents.filter((e) => e.status === "completed" || e.date < today);
+
+          const eventIds = clubEvents.map((e) => e.id);
+          if (eventIds.length > 0) {
+            const { data: registrations } = await supabase
+              .from("registrations")
+              .select("event_id")
+              .in("event_id", eventIds);
+
+            const counts: Record<string, number> = {};
+            let total = 0;
+            registrations?.forEach((reg) => {
+              counts[reg.event_id] = (counts[reg.event_id] || 0) + 1;
+              total++;
+            });
+            setRegistrationCounts(counts);
+
+            setStats({
+              totalEvents: clubEvents.length,
+              upcomingEvents: upcoming.length,
+              completedEvents: completed.length,
+              totalRegistrations: total,
+            });
+          }
+
           setLoading(false);
           return;
         }
@@ -91,13 +175,65 @@ export default function ClubPage() {
 
         if (error) throw error;
 
-        const clubEvents = (eventsData as Event[]) || [];
+        let clubEvents = (eventsData as Event[]) || [];
+
+        // In development, merge local seed events that match this club
+        if (process.env.NODE_ENV === "development") {
+          try {
+            const seedModule = await import("@/data/seedEvents");
+            const seedEvents = seedModule.seedEvents || [];
+            const matchingSeed = seedEvents.filter((s: any) => (s.organizer_id === "seed:fine-arts" && club.id === "fine-arts-club") || (s.organizer_id === "seed:gdg" && club.id === "gdg"));
+
+            // convert to Event shape where necessary and dedupe
+            const existingIds = new Set(clubEvents.map((e) => e.id));
+            const seedAsEvents = matchingSeed.map((s: any) => ({
+              id: s.id,
+              title: s.title,
+              description: s.description,
+              date: s.date,
+              time: s.time || null,
+              venue: s.venue,
+              department: s.department || null,
+              category: s.category || null,
+              status: s.status as any,
+              poster_url: s.poster_url || null,
+              organizer_id: s.organizer_id,
+            }));
+
+            clubEvents = [...seedAsEvents.filter((s) => !existingIds.has(s.id)), ...clubEvents];
+          } catch (e) {
+            // ignore
+          }
+        }
+
         setEvents(clubEvents);
+
+        // If the page was opened with an eventId in state (e.g., from the seed event), show it
+        const eventIdFromState = (location.state as any)?.eventId;
+        if (eventIdFromState) {
+          const found = clubEvents.find((e) => e.id === eventIdFromState);
+          if (found) setSelectedEvent(found);
+        }
 
         // Calculate stats
         const today = new Date().toISOString().split("T")[0];
         const upcoming = clubEvents.filter((e) => e.date >= today && e.status === "approved");
         const completed = clubEvents.filter((e) => e.status === "completed" || e.date < today);
+
+        // Handlers for club page actions
+        const handleRegister = (event: Event) => {
+          const externalUrl = (event as any).register_url as string | undefined;
+          if (externalUrl) {
+            window.open(externalUrl, "_blank", "noopener,noreferrer");
+            return;
+          }
+          // Fallback: navigate to auth (or registration flow)
+          navigate("/auth");
+        };
+
+        const handleViewDetailsLocal = (event: Event) => {
+          setSelectedEvent(event);
+        };
 
         // Fetch registration counts
         const eventIds = clubEvents.map((e) => e.id);
@@ -236,33 +372,55 @@ export default function ClubPage() {
                     </Card>
                   ))}
                 </div>
-              ) : upcomingEvents.length > 0 ? (
-                <div className="grid md:grid-cols-2 gap-4">
-                  {upcomingEvents.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      id={event.id}
-                      title={event.title}
-                      description={event.description || ""}
-                      date={event.date}
-                      time={event.time || "TBD"}
-                      venue={event.venue || "TBD"}
-                      department={event.department || "General"}
-                      category={event.category || "Event"}
-                      status={event.status}
-                      registrations={registrationCounts[event.id] || 0}
-                      posterUrl={event.poster_url || undefined}
-                      showActions={false}
-                    />
-                  ))}
-                </div>
               ) : (
-                <Card className="p-8 text-center">
-                  <Clock className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
-                  <p className="text-muted-foreground">
-                    No upcoming events scheduled. Check back soon!
-                  </p>
-                </Card>
+                <>
+                  {/* If a specific event is selected via state, show its full details here */}
+                  {selectedEvent && (
+                    <Card className="mb-6">
+                      <CardHeader>
+                        <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground mb-4">{selectedEvent.description}</p>
+                        <div className="flex gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" />{selectedEvent.date}</div>
+                          <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-primary" />{selectedEvent.time || 'TBD'}</div>
+                          <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" />{selectedEvent.venue}</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {upcomingEvents.length > 0 ? (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {upcomingEvents.map((event) => (
+                        <EventCard
+                          key={event.id}
+                          id={event.id}
+                          title={event.title}
+                          description={event.description || ""}
+                          date={event.date}
+                          time={event.time || "TBD"}
+                          venue={event.venue || "TBD"}
+                          department={event.department || "General"}
+                          category={event.category || "Event"}
+                          status={event.status}
+                          registrations={registrationCounts[event.id] || 0}
+                          posterUrl={event.poster_url || undefined}
+                          onRegister={() => handleRegister(event)}
+                          onViewDetails={() => handleViewDetailsLocal(event)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <Card className="p-8 text-center">
+                      <Clock className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+                      <p className="text-muted-foreground">
+                        No upcoming events scheduled. Check back soon!
+                      </p>
+                    </Card>
+                  )}
+                </>
               )}
             </div>
 
