@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
+import { sendEventRegistrationEmail } from "@/utils/email";
 
 interface Event {
   id: string;
@@ -146,6 +147,16 @@ export function useEventRegistration() {
         title: "Registration Successful!",
         description: `You have registered for "${event.title}"`,
       });
+
+      // Send confirmation email
+      sendEventRegistrationEmail(
+        userEmail,
+        userName,
+        event.title,
+        event.date,
+        event.time || "TBD",
+        event.venue || "TBD"
+      );
 
       return {
         id: data.id,
