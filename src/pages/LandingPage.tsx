@@ -128,7 +128,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-            <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 hero-gradient opacity-5 pointer-events-none" />
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
@@ -350,6 +350,61 @@ export default function LandingPage() {
             Sign in with College Email
             <ArrowRight className="w-4 h-4" />
           </Button>
+        </div>
+      </section>
+
+      {/* Campus Showcase Section */}
+      <section className="py-16 md:py-24 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Our Campus
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              CMR Institute of Technology - Where innovation meets excellence
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/main-building.jpg"
+                alt="CMRIT Main Building"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Main Building</h3>
+                <p className="text-sm text-white/80">Academic Block</p>
+              </div>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/building-side.jpg"
+                alt="CMRIT Campus View"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Campus View</h3>
+                <p className="text-sm text-white/80">Green Environment</p>
+              </div>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/lobby.jpg"
+                alt="CMRIT Reception"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Reception</h3>
+                <p className="text-sm text-white/80">Welcome Area</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
