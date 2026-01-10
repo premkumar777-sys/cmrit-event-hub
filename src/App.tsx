@@ -19,6 +19,9 @@ import CanteenMenuPage from "./pages/CanteenMenuPage";
 import CanteenAdminPage from "./pages/CanteenAdminPage";
 import CanteenScannerPage from "./pages/CanteenScannerPage";
 import ClubPage from "./pages/ClubPage";
+import StudentRegistrations from "./pages/StudentRegistrations";
+import RegistrationsPage from "./pages/RegistrationsPage";
+import BrowseEvents from "./pages/BrowseEvents";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -47,10 +50,18 @@ const App = () => (
             } />
             <Route path="/registrations" element={
               <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
-                <StudentDashboard />
+                <StudentRegistrations />
               </ProtectedRoute>
             } />
-            <Route path="/certificates" element={
+            {/* Organizer-managed registrations */}
+            <Route path="/registrations/manage" element={
+              <ProtectedRoute allowedRoles={["organizer", "faculty", "hod", "admin"]}>
+                <RegistrationsPage />
+              </ProtectedRoute>
+            } />
+
+            {/* Browse events (public) */}
+            <Route path="/browse-events" element={<BrowseEvents />} />            <Route path="/certificates" element={
               <ProtectedRoute allowedRoles={['student', 'organizer', 'faculty', 'hod', 'admin']}>
                 <CertificatesPage />
               </ProtectedRoute>
@@ -82,6 +93,11 @@ const App = () => (
                 <CreateEventPage />
               </ProtectedRoute>
             } />
+
+            {/* Development-only preview route for CreateEventPage */}
+            {process.env.NODE_ENV === 'development' && (
+              <Route path="/create-event/dev" element={<CreateEventPage />} />
+            )}
             <Route path="/scanner" element={
               <ProtectedRoute allowedRoles={['organizer', 'faculty', 'hod', 'admin']}>
                 <QRScannerPage />

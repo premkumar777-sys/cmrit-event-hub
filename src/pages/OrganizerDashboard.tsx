@@ -6,87 +6,59 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Users, ClipboardCheck, Plus, Eye } from "lucide-react";
+import { Calendar, Users, ClipboardCheck, Plus, Eye, XCircle, ArchiveRestore, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useOrganizerEvents } from "@/hooks/useOrganizerEvents";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Loader2 } from "lucide-react";
 
-const mockUser = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@cmrit.ac.in",
-  role: "organizer" as const,
-};
+// Data is fetched using hooks: organizer events and registration counts (see useOrganizerEvents.ts)
 
-const mockEvents = [
-  {
-    id: "1",
-    title: "Hackathon 2024: Build the Future",
-    description: "48-hour hackathon with exciting prizes and mentorship from industry experts.",
-    date: "Feb 10, 2024",
-    time: "9:00 AM onwards",
-    venue: "Innovation Hub",
-    department: "CSE",
-    category: "Competition",
-    status: "approved" as const,
-    registrations: 150,
-    posterUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400",
-  },
-  {
-    id: "2",
-    title: "Web Development Bootcamp",
-    description: "Learn React, Node.js, and MongoDB in this comprehensive 3-day bootcamp.",
-    date: "Feb 15, 2024",
-    time: "10:00 AM - 5:00 PM",
-    venue: "Lab 3",
-    department: "CSE",
-    category: "Workshop",
-    status: "pending" as const,
-    registrations: 0,
-  },
-  {
-    id: "3",
-    title: "Tech Talk: Future of AI",
-    description: "Industry expert sharing insights on the future of artificial intelligence.",
-    date: "Feb 5, 2024",
-    time: "3:00 PM - 5:00 PM",
-    venue: "Seminar Hall B",
-    department: "CSE",
-    category: "Seminar",
-    status: "completed" as const,
-    registrations: 80,
-  },
-  {
-    id: "4",
-    title: "Mobile App Development",
-    description: "Introduction to Flutter and cross-platform mobile development.",
-    date: "Feb 20, 2024",
-    time: "10:00 AM - 4:00 PM",
-    venue: "Lab 2",
-    department: "CSE",
-    category: "Workshop",
-    status: "rejected" as const,
-    registrations: 0,
-  },
-];
-
-const recentRegistrations = [
-  { name: "Alice Smith", event: "Hackathon 2024", time: "2 hours ago" },
-  { name: "Bob Kumar", event: "Hackathon 2024", time: "3 hours ago" },
-  { name: "Charlie Reddy", event: "Hackathon 2024", time: "5 hours ago" },
-  { name: "Diana Sharma", event: "Hackathon 2024", time: "6 hours ago" },
-];
 
 export default function OrganizerDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("all");
+  const { user } = useAuth();
 
-  const filteredEvents = mockEvents.filter((event) => {
+  const { events, loading, registrationsMap, refetch, closeRegistration, cancelEvent } = useOrganizerEvents();
+
+  const filteredEvents = (events || []).filter((event) => {
     if (activeTab === "all") return true;
     return event.status === activeTab;
   });
 
+  const totalRegistrations = Object.values(registrationsMap || {}).reduce((a, b) => a + b, 0);
+
+  const dashboardUser = {
+    name: user?.user_metadata?.full_name || user?.email || 'Organizer',
+    email: user?.email || '',
+    role: 'organizer' as const,
+  };
+
+  const [openRegsFor, setOpenRegsFor] = useState<string | null>(null);
+  const [registrationsList, setRegistrationsList] = useState<any[]>([]);
+  const [regsLoading, setRegsLoading] = useState(false);
+
+  const openRegistrations = async (eventId: string) => {
+    setOpenRegsFor(eventId);
+    setRegsLoading(true);
+    const regs = await fetchRegistrations(eventId);
+    setRegistrationsList(regs || []);
+    setRegsLoading(false);
+  };
+
+  const handleCloseRegistrations = async (eventId: string) => {
+    await closeRegistration(eventId);
+  };
+
+  const handleCancelEvent = async (eventId: string) => {
+    await cancelEvent(eventId);
+  };
+
   return (
-    <DashboardLayout user={mockUser}>
-      <div className="space-y-6">
-        {/* Welcome Section */}
+    <DashboardLayout user={dashboardUser}>
+      <div className="space-y-6">        {/* Welcome Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">
@@ -98,7 +70,7 @@ export default function OrganizerDashboard() {
           </div>
           <Button onClick={() => navigate("/create-event")} className="gap-2">
             <Plus className="w-4 h-4" />
-            Create Event
+            Schedule Event
           </Button>
         </div>
 
@@ -106,23 +78,23 @@ export default function OrganizerDashboard() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
           <StatsCard
             title="Total Events"
-            value={mockEvents.length}
+            value={loading ? "-" : events.length}
             icon={Calendar}
           />
           <StatsCard
             title="Total Registrations"
-            value={230}
+            value={loading ? "-" : totalRegistrations}
             icon={Users}
             trend={{ value: 12, isPositive: true }}
           />
           <StatsCard
             title="Pending Approvals"
-            value={1}
+            value={loading ? "-" : events.filter(e => e.status === 'pending').length}
             icon={ClipboardCheck}
           />
           <StatsCard
             title="Completed Events"
-            value={1}
+            value={loading ? "-" : events.filter(e => e.status === 'completed').length}
             icon={Calendar}
           />
         </div>
@@ -152,8 +124,25 @@ export default function OrganizerDashboard() {
                     >
                       <EventCard
                         {...event}
-                        showActions={false}
-                        onViewDetails={() => {}}
+                        registrations={registrationsMap[event.id] || 0}
+                        showActions={true}
+                        onViewDetails={() => navigate('/my-events', { state: { eventId: event.id } })}
+                        actions={(
+                          <div className="flex gap-2">
+                            <Button size="sm" variant="outline" onClick={() => openRegistrations(event.id)}>
+                              <Eye className="w-4 h-4 mr-2" />
+                              Registrations
+                            </Button>
+                            <Button size="sm" onClick={() => handleCloseRegistrations(event.id)}>
+                              <ArchiveRestore className="w-4 h-4 mr-2" />
+                              Close
+                            </Button>
+                            <Button size="sm" variant="destructive" onClick={() => handleCancelEvent(event.id)}>
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Cancel
+                            </Button>
+                          </div>
+                        )}
                       />
                     </div>
                   ))}
@@ -166,6 +155,46 @@ export default function OrganizerDashboard() {
                   </div>
                 )}
               </TabsContent>
+
+              {/* Registrations Dialog */}
+              <Dialog open={!!openRegsFor} onOpenChange={() => setOpenRegsFor(null)}>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Registrations</DialogTitle>
+                  </DialogHeader>
+
+                  <div>
+                    {regsLoading ? (
+                      <div className="py-8 text-center">
+                        <Loader2 className="w-6 h-6 animate-spin mx-auto" />
+                        <p className="text-muted-foreground mt-2">Loading...</p>
+                      </div>
+                    ) : registrationsList.length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <p>No registrations yet.</p>
+                      </div>
+                    ) : (
+                      <ul className="divide-y">
+                        {registrationsList.map((r) => (
+                          <li key={r.id} className="p-3 flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{r.profile.full_name || r.profile.email}</p>
+                              <p className="text-xs text-muted-foreground">{r.profile.email}</p>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setOpenRegsFor(null)}>
+                      Close
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </Tabs>
           </div>
 
@@ -175,20 +204,20 @@ export default function OrganizerDashboard() {
             <Card>
               <CardContent className="p-0">
                 <ul className="divide-y">
-                  {recentRegistrations.map((reg, index) => (
+                  {(events || []).sort((a,b) => (registrationsMap[b.id] || 0) - (registrationsMap[a.id] || 0)).slice(0,4).map((evt, index) => (
                     <li
-                      key={index}
+                      key={evt.id}
                       className="p-4 hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-sm">{reg.name}</p>
+                          <p className="font-medium text-sm">{evt.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            {reg.event}
+                            {evt.department || evt.category || 'Event'}
                           </p>
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {reg.time}
+                          {(registrationsMap[evt.id] || 0) + ' registrations'}
                         </span>
                       </div>
                     </li>

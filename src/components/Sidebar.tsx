@@ -40,7 +40,7 @@ const navItems: NavItem[] = [
   },
   {
     label: "Browse Events",
-    href: "/events",
+    href: "/browse-events",
     icon: Calendar,
     roles: ["student"],
   },

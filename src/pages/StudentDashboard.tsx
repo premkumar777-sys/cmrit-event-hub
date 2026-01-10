@@ -5,7 +5,8 @@ import { StatsCard } from "@/components/StatsCard";
 import { EventCard } from "@/components/EventCard";
 import { DepartmentFilter } from "@/components/DepartmentFilter";
 import { RegistrationTicketDialog } from "@/components/RegistrationTicketDialog";
-import { Calendar, Award, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { Calendar, Award, CheckCircle, Clock, Loader2, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
 import { supabase } from "@/integrations/supabase/client";
@@ -237,6 +238,17 @@ export default function StudentDashboard() {
           <p className="text-muted-foreground mt-1">
             Discover and register for upcoming events across departments.
           </p>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button onClick={() => navigate('/browse-events')} className="gap-2">
+              <Calendar className="w-4 h-4" />
+              Browse Events
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/registrations')} className="gap-2">
+              <FileText className="w-4 h-4" />
+              My Registrations
+            </Button>
+          </div>
         </div>
 
         {/* Stats Grid */}

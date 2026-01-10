@@ -207,6 +207,25 @@ export function useEventRegistration() {
     };
   };
 
+  // Cancel registration
+  const cancelRegistration = async (registrationId: string) => {
+    if (!user) return false;
+    try {
+      const { error } = await supabase
+        .from('registrations')
+        .delete()
+        .eq('id', registrationId);
+      if (error) throw error;
+      await fetchRegistrations();
+      toast({ title: 'Registration cancelled', description: 'You have been unregistered from the event.' });
+      return true;
+    } catch (err) {
+      console.error('Error cancelling registration:', err);
+      toast({ title: 'Error', description: 'Failed to cancel registration', variant: 'destructive' });
+      return false;
+    }
+  };
+
   // Check if user is registered for an event
   const isRegistered = (eventId: string): boolean => {
     return registrations.some((r) => r.event_id === eventId);
@@ -225,5 +244,6 @@ export function useEventRegistration() {
     isRegistered,
     getRegistrationByEventId,
     refreshRegistrations: fetchRegistrations,
+    cancelRegistration,
   };
 }
