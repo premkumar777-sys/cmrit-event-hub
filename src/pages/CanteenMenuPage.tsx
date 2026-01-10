@@ -9,6 +9,7 @@ import { OrderCard } from "@/components/canteen/OrderCard";
 import { useCanteen } from "@/hooks/useCanteen";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const categories = [
@@ -39,10 +40,12 @@ export default function CanteenMenuPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
 
+  const { profile } = useUserProfile();
+
   const dashboardUser = {
-    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User",
+    name: profile?.full_name || user?.email?.split('@')[0] || "Canteen Admin",
     email: user?.email || "",
-    role: primaryRole as "student" | "organizer" | "faculty" | "hod" | "admin",
+    role: "canteen_admin" as const,
     avatar: user?.user_metadata?.avatar_url,
   };
 

@@ -25,12 +25,8 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-const mockUser = {
-  name: "Admin User",
-  email: "admin@cmrit.ac.in",
-  role: "admin" as const,
-};
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const registrationData = [
   { name: "CSE", registrations: 450 },
@@ -64,6 +60,15 @@ const recentEvents = [
 ];
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
+  const { profile } = useUserProfile();
+
+  const mockUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Administrator",
+    email: user?.email || "",
+    role: "admin" as const,
+  };
+
   return (
     <DashboardLayout user={mockUser}>
       <div className="space-y-6">

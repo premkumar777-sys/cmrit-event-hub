@@ -10,7 +10,7 @@ interface DashboardLayoutProps {
   user: {
     name: string;
     email: string;
-    role: "student" | "organizer" | "faculty" | "hod" | "admin";
+    role: "student" | "organizer" | "faculty" | "hod" | "admin" | "canteen_admin";
     avatar?: string;
   };
   onLogout?: () => void;

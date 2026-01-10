@@ -1,13 +1,9 @@
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { Button } from "@/components/ui/button";
 import { Award, Download, Eye, Calendar, MapPin } from "lucide-react";
-
-const mockUser = {
-  name: "John Doe",
-  email: "john.doe@cmrit.ac.in",
-  role: "student" as const,
-};
 
 const certificates = [
   {
@@ -36,7 +32,11 @@ const certificates = [
   },
 ];
 
+
 export default function CertificatesPage() {
+  const { user } = useAuth();
+  const { profile } = useUserProfile();
+
   const handleDownload = (certId: string) => {
     // Simulate download
     console.log("Downloading certificate:", certId);
@@ -47,8 +47,14 @@ export default function CertificatesPage() {
     console.log("Viewing certificate:", certId);
   };
 
+  const dashboardUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Student",
+    email: user?.email || "",
+    role: "student" as const,
+  };
+
   return (
-    <DashboardLayout user={mockUser}>
+    <DashboardLayout user={dashboardUser}>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="animate-fade-in">

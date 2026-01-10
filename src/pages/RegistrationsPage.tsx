@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useOrganizerEvents } from "@/hooks/useOrganizerEvents";
@@ -7,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function RegistrationsPage() {
+  const { user } = useAuth();
   const { events, loading, fetchRegistrations } = useOrganizerEvents();
   const [openFor, setOpenFor] = useState<string | null>(null);
   const [regs, setRegs] = useState<any[]>([]);
@@ -38,8 +41,16 @@ export default function RegistrationsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const { profile } = useUserProfile();
+
+  const dashboardUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Organizer",
+    email: user?.email || "",
+    role: "organizer" as const,
+  };
+
   return (
-    <DashboardLayout user={{ name: 'Organizer', email: '', role: 'organizer' }}>
+    <DashboardLayout user={dashboardUser}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Registrations</h1>
@@ -83,7 +94,7 @@ export default function RegistrationsPage() {
               <div className="font-semibold">Attendees</div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={close}>Close</Button>
-                <Button onClick={exportCSV} disabled={regs.length===0}>Export CSV</Button>
+                <Button onClick={exportCSV} disabled={regs.length === 0}>Export CSV</Button>
               </div>
             </div>
             {regsLoading ? (

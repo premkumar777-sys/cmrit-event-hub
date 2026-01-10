@@ -26,6 +26,7 @@ import MenuManager from "./MenuManager";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-700" },
@@ -49,10 +50,12 @@ export default function CanteenAdminPage() {
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  const { profile } = useUserProfile();
+
   const dashboardUser = {
-    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Canteen Admin",
+    name: profile?.full_name || user?.email?.split('@')[0] || "Canteen Admin",
     email: user?.email || "",
-    role: "admin" as const,
+    role: "canteen_admin" as const,
     avatar: user?.user_metadata?.avatar_url,
   };
 
@@ -346,8 +349,8 @@ export default function CanteenAdminPage() {
                             slot.percentage > 80
                               ? "[&>div]:bg-red-500"
                               : slot.percentage > 50
-                              ? "[&>div]:bg-yellow-500"
-                              : ""
+                                ? "[&>div]:bg-yellow-500"
+                                : ""
                           }
                         />
                       </div>

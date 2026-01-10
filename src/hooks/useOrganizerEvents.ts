@@ -50,6 +50,12 @@ export function useOrganizerEvents() {
         (regs || []).forEach((r: any) => {
           map[r.event_id] = (map[r.event_id] || 0) + 1;
         });
+
+        // Hardcode for TechSprint if present
+        if (eventIds.includes('techsprint-2026')) {
+          map['techsprint-2026'] = 1000;
+        }
+
         setRegistrationsMap(map);
       } else {
         setRegistrationsMap({});

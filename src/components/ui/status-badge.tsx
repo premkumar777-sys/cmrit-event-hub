@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type StatusType = "draft" | "pending" | "approved" | "rejected" | "completed";
+type StatusType = "draft" | "pending" | "approved" | "rejected" | "completed" | "ongoing";
 
 interface StatusBadgeProps {
   status: StatusType;
@@ -28,11 +28,15 @@ const statusConfig: Record<StatusType, { label: string; className: string }> = {
     label: "Completed",
     className: "bg-status-completed text-status-completed-foreground",
   },
+  ongoing: {
+    label: "Ongoing",
+    className: "bg-blue-500 text-white",
+  },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const config = statusConfig[status];
-  
+
   return (
     <span
       className={cn(

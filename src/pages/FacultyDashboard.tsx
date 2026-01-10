@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -18,11 +19,15 @@ import {
 import { ClipboardCheck, Calendar, Users, CheckCircle, XCircle, Clock, AlertTriangle, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { useEventApprovals, PendingEvent } from "@/hooks/useEventApprovals";
 import { usePermissionRequests } from "@/hooks/usePermissionRequests";
 import { format, formatDistanceToNow } from "date-fns";
 
+import { useNavigate } from "react-router-dom";
+
 export default function FacultyDashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { primaryRole } = useUserRole();
   const { pendingEvents, loading: eventsLoading, approveEvent, rejectEvent, userApprovalLevel } = useEventApprovals();
@@ -31,9 +36,10 @@ export default function FacultyDashboard() {
   const [selectedEvent, setSelectedEvent] = useState<PendingEvent | null>(null);
   const [comments, setComments] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const { profile } = useUserProfile();
 
-  const mockUser = {
-    name: user?.user_metadata?.full_name || "Faculty Member",
+  const dashboardUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Faculty",
     email: user?.email || "",
     role: primaryRole as "faculty" | "hod" | "admin",
   };
@@ -91,16 +97,22 @@ export default function FacultyDashboard() {
   };
 
   return (
-    <DashboardLayout user={mockUser}>
+    <DashboardLayout user={dashboardUser}>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="animate-fade-in">
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {primaryRole === 'hod' ? 'HOD Dashboard' : 'Faculty Dashboard'}
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Review event approvals and student permission requests.
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">
+              {primaryRole === 'hod' ? 'HOD Dashboard' : 'Faculty Dashboard'}
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Review event approvals and student permission requests.
+            </p>
+          </div>
+          <Button onClick={() => navigate('/approve-events')} className="gap-2 bg-primary text-primary-foreground shadow-md hover:shadow-lg transition-all">
+            <ClipboardCheck className="w-4 h-4" />
+            Approve Event
+          </Button>
         </div>
 
         {/* Stats Grid */}

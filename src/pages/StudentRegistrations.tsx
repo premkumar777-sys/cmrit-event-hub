@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { useEventRegistration } from "@/hooks/useEventRegistration";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -9,6 +11,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function StudentRegistrations() {
+  const { user } = useAuth();
   const { registrations, loading, getRegistrationDetails, cancelRegistration, refreshRegistrations } = useEventRegistration();
   const [ticketOpen, setTicketOpen] = useState(false);
   const [ticket, setTicket] = useState<any | null>(null);
@@ -50,8 +53,16 @@ export default function StudentRegistrations() {
     refreshRegistrations();
   };
 
+  const { profile } = useUserProfile();
+
+  const dashboardUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Student",
+    email: user?.email || "",
+    role: "student" as const,
+  };
+
   return (
-    <DashboardLayout user={{ name: 'Student', email: '', role: 'student' }}>
+    <DashboardLayout user={dashboardUser}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">My Registrations</h1>

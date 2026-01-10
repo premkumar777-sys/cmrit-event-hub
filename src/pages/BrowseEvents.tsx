@@ -3,11 +3,13 @@ import { EventCard } from "@/components/EventCard";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useEventRegistration } from "@/hooks/useEventRegistration";
-import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { useEventRegistration } from "@/hooks/useEventRegistration";
+import { Button } from "@/components/ui/button";
 
 export default function BrowseEvents() {
   const [events, setEvents] = useState<any[]>([]);
@@ -20,7 +22,7 @@ export default function BrowseEvents() {
       setLoading(true);
       const { data } = await supabase
         .from('events')
-        .select('*')
+        .select('*, organizer:profiles(full_name, email)')
         .eq('status', 'approved')
         .order('date', { ascending: true });
       // Merge seed events in development so dev environment shows example events
@@ -30,7 +32,7 @@ export default function BrowseEvents() {
           const seedModule = await import("@/data/seedEvents");
           const seedEvents = seedModule.seedEvents || [];
           const existingIds = new Set((merged || []).map((e: any) => e.id));
-          merged = [...merged, ...seedEvents.filter((s: any) => !existingIds.has(s.id))];
+          merged = [...merged, ...seedEvents.filter((s: any) => !existingIds.has(s.id))] as any[];
         } catch (e) {
           // ignore if seed module not present
         }
@@ -44,12 +46,19 @@ export default function BrowseEvents() {
 
   const filtered = events.filter(e => (e.title || '').toLowerCase().includes(query.toLowerCase()) || (e.description || '').toLowerCase().includes(query.toLowerCase()));
 
+  const { profile } = useUserProfile();
   const { user } = useAuth();
   const { primaryRole } = useUserRole();
   const navigate = useNavigate();
 
+  const dashboardLayoutUser = user ? {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Guest",
+    email: user?.email || "",
+    role: "student" as const // Fallback to student for guest view
+  } : { name: 'Guest', email: '', role: 'student' as const };
+
   return (
-    <DashboardLayout user={{ name: 'Guest', email: '', role: 'student' }}>
+    <DashboardLayout user={dashboardLayoutUser}>
       <div className="space-y-6">
         <div className="flex items-start justify-between">
           <div>
@@ -86,7 +95,9 @@ export default function BrowseEvents() {
                     window.open(ev.register_url, '_blank');
                     return;
                   }
-                  registerForEvent(ev.id as string);
+                  // Pass the prompt organizer name or a fallback
+                  const orgName = ev.organizer?.full_name || ev.organizer?.email?.split('@')[0] || "Organizer";
+                  registerForEvent(ev, orgName);
                 }}
               />
             ))

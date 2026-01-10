@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { EventCard } from "@/components/EventCard";
@@ -10,6 +10,8 @@ import { Calendar, Users, ClipboardCheck, Plus, Eye, XCircle, ArchiveRestore, Tr
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrganizerEvents } from "@/hooks/useOrganizerEvents";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 
@@ -30,9 +32,11 @@ export default function OrganizerDashboard() {
 
   const totalRegistrations = Object.values(registrationsMap || {}).reduce((a, b) => a + b, 0);
 
+  const { profile } = useUserProfile();
+
   const dashboardUser = {
-    name: user?.user_metadata?.full_name || user?.email || 'Organizer',
-    email: user?.email || '',
+    name: profile?.full_name || user?.email?.split('@')[0] || "Organizer",
+    email: user?.email || "",
     role: 'organizer' as const,
   };
 
@@ -43,8 +47,15 @@ export default function OrganizerDashboard() {
   const openRegistrations = async (eventId: string) => {
     setOpenRegsFor(eventId);
     setRegsLoading(true);
-    const regs = await fetchRegistrations(eventId);
-    setRegistrationsList(regs || []);
+    // For now we do not have a separate fetchRegistrations in useOrganizerEvents, so we should expose it or invoke supabase directly. 
+    // But waiting, useOrganizerEvents handles registrationsMap.
+    // If we want detailed list, we need to fetch it.
+    const { data } = await supabase
+      .from('registrations')
+      .select('*, profile:profiles(*)')
+      .eq('event_id', eventId);
+
+    setRegistrationsList(data || []);
     setRegsLoading(false);
   };
 
@@ -124,6 +135,7 @@ export default function OrganizerDashboard() {
                     >
                       <EventCard
                         {...event}
+                        status={event.status as any}
                         registrations={registrationsMap[event.id] || 0}
                         showActions={true}
                         onViewDetails={() => navigate('/my-events', { state: { eventId: event.id } })}
@@ -204,7 +216,7 @@ export default function OrganizerDashboard() {
             <Card>
               <CardContent className="p-0">
                 <ul className="divide-y">
-                  {(events || []).sort((a,b) => (registrationsMap[b.id] || 0) - (registrationsMap[a.id] || 0)).slice(0,4).map((evt, index) => (
+                  {(events || []).sort((a, b) => (registrationsMap[b.id] || 0) - (registrationsMap[a.id] || 0)).slice(0, 4).map((evt, index) => (
                     <li
                       key={evt.id}
                       className="p-4 hover:bg-muted/50 transition-colors"

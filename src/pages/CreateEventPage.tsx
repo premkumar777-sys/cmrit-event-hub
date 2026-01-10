@@ -17,6 +17,7 @@ import { Calendar, Upload, ArrowLeft, Send, Sparkles, Loader2 } from "lucide-rea
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import type { Database } from "@/integrations/supabase/types";
 
 type Department = Database["public"]["Enums"]["department"];
@@ -89,7 +90,7 @@ export default function CreateEventPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -174,11 +175,13 @@ export default function CreateEventPage() {
     }
   };
 
-  const userForLayout = user ? {
-    name: user.user_metadata?.full_name || user.email || "User",
-    email: user.email || "",
-    role: "organizer" as const,
-  } : { name: "Guest", email: "", role: "organizer" as const };
+  const { profile } = useUserProfile();
+
+  const userForLayout = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Organizer",
+    email: user?.email || "",
+    role: "organizer" as const, // Assuming organizer role for this page
+  };
 
   return (
     <DashboardLayout user={userForLayout}>

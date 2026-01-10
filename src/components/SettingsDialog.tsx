@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { RoleBadge } from "@/components/ui/role-badge";
 
 type ThemePref = "light" | "dark" | "system";
 
@@ -33,7 +34,20 @@ function applyTheme(pref: ThemePref) {
   }
 }
 
-export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+export function SettingsDialog({
+  open,
+  onOpenChange,
+  user,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  user?: {
+    name: string;
+    email: string;
+    role: "student" | "organizer" | "faculty" | "hod" | "admin" | "canteen_admin";
+    avatar?: string;
+  };
+}) {
   const [theme, setTheme] = useState<ThemePref>("system");
 
   useEffect(() => {
@@ -53,7 +67,7 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
     try {
       if (theme === "system") localStorage.removeItem(STORAGE_KEY);
       else localStorage.setItem(STORAGE_KEY, theme);
-    } catch (_) {}
+    } catch (_) { }
   }, [theme]);
 
   useEffect(() => {
@@ -75,6 +89,28 @@ export function SettingsDialog({ open, onOpenChange }: { open: boolean; onOpenCh
         </DialogHeader>
 
         <div className="mt-4 space-y-4">
+          {user && (
+            <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div>
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Designation</span>
+                <RoleBadge role={user.role} showIcon={false} />
+              </div>
+            </div>
+          )}
+
           <div>
             <p className="text-sm font-medium">Theme</p>
             <p className="text-xs text-muted-foreground mb-2">Choose light, dark or follow system</p>

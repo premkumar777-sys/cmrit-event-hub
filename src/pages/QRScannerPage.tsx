@@ -12,12 +12,8 @@ import {
 } from "@/components/ui/select";
 import { QrCode, Camera, CheckCircle, XCircle, Users, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-const mockUser = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@cmrit.ac.in",
-  role: "organizer" as const,
-};
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const mockEvents = [
   { id: "1", title: "AI/ML Workshop", attendees: 42, total: 85 },

@@ -1,6 +1,7 @@
-import { Bell, Menu, User, LogOut } from "lucide-react";
+import { Bell, Menu, User, LogOut, Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +18,7 @@ interface HeaderProps {
   user?: {
     name: string;
     email: string;
-    role: "student" | "organizer" | "faculty" | "hod" | "admin";
+    role: "student" | "organizer" | "faculty" | "hod" | "admin" | "canteen_admin";
     avatar?: string;
   };
   onMenuClick?: () => void;
@@ -34,6 +35,10 @@ export function Header({
   className,
 }: HeaderProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const navigate = useNavigate();
+  const isDev = (import.meta as any).env?.DEV ?? false;
+  const schedulePath = isDev ? '/create-event/dev' : '/create-event';
+  const showScheduleCTA = !!(user?.role === 'organizer' || isDev);
   return (
     <header
       className={cn(
@@ -65,6 +70,17 @@ export function Header({
         <div className="flex-1" />
 
         <div className="flex items-center gap-2">
+          {showScheduleCTA && (
+            <Button
+              onClick={() => navigate(schedulePath)}
+              title={isDev && !user ? "Schedule Event (dev preview)" : "Schedule Event"}
+              className="gap-2 bg-primary text-primary-foreground shadow-md hover:shadow-lg transition-all"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Schedule Event</span>
+            </Button>
+          )}
+
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             {notificationCount > 0 && (
@@ -114,7 +130,7 @@ export function Header({
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+          <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} user={user} />
         </div>
       </div>
     </header>

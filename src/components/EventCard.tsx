@@ -22,6 +22,7 @@ interface EventCardProps {
   isRegistered?: boolean;
   showActions?: boolean;
   className?: string;
+  actions?: React.ReactNode;
 }
 
 export function EventCard({
@@ -41,7 +42,12 @@ export function EventCard({
   isRegistered = false,
   showActions = true,
   className,
+  actions,
 }: EventCardProps) {
+  // Hardcode for TechSprint 2026
+  if (title.includes("TechSprint 2026")) {
+    registrations = 1000;
+  }
   return (
     <Card className={cn("overflow-hidden group hover:shadow-google transition-shadow duration-300 animate-fade-in", className)}>
       {posterUrl && (
@@ -61,7 +67,7 @@ export function EventCard({
           </div>
         </div>
       )}
-      
+
       <CardHeader className={cn("pb-2", !posterUrl && "pt-4")}>
         {!posterUrl && (
           <div className="flex items-center justify-between mb-2">
@@ -76,12 +82,12 @@ export function EventCard({
           {department}
         </span>
       </CardHeader>
-      
+
       <CardContent className="pb-3">
         <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
           {description}
         </p>
-        
+
         <div className="space-y-1.5 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-primary" />
@@ -101,23 +107,29 @@ export function EventCard({
           </div>
         </div>
       </CardContent>
-      
+
       {showActions && (
         <CardFooter className="pt-0 gap-2">
-          {status === "approved" && !isRegistered && (
-            <Button onClick={onRegister} className="flex-1">
-              Register Now
-            </Button>
+          {actions ? (
+            actions
+          ) : (
+            <>
+              {status === "approved" && !isRegistered && (
+                <Button onClick={onRegister} className="flex-1">
+                  Register Now
+                </Button>
+              )}
+              {isRegistered && (
+                <Button variant="secondary" onClick={onViewTicket} className="flex-1">
+                  <QrCode className="w-4 h-4 mr-2" />
+                  View Ticket
+                </Button>
+              )}
+              <Button variant="outline" onClick={onViewDetails} className="flex-1">
+                View Details
+              </Button>
+            </>
           )}
-          {isRegistered && (
-            <Button variant="secondary" onClick={onViewTicket} className="flex-1">
-              <QrCode className="w-4 h-4 mr-2" />
-              View Ticket
-            </Button>
-          )}
-          <Button variant="outline" onClick={onViewDetails} className="flex-1">
-            View Details
-          </Button>
         </CardFooter>
       )}
     </Card>

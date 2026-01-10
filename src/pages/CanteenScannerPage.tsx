@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCanteenAdmin } from "@/hooks/useCanteenAdmin";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 interface ScanResult {
   success: boolean;
@@ -27,10 +28,12 @@ export default function CanteenScannerPage() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const { profile } = useUserProfile();
+
   const dashboardUser = {
-    name: user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Canteen Admin",
+    name: profile?.full_name || user?.email?.split('@')[0] || "Canteen Staff",
     email: user?.email || "",
-    role: "admin" as const,
+    role: "canteen_admin" as const,
     avatar: user?.user_metadata?.avatar_url,
   };
 
@@ -189,9 +192,8 @@ export default function CanteenScannerPage() {
                 )}
                 <div className="flex-1">
                   <p
-                    className={`font-semibold text-lg ${
-                      scanResult.success ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"
-                    }`}
+                    className={`font-semibold text-lg ${scanResult.success ? "text-green-700 dark:text-green-400" : "text-red-700 dark:text-red-400"
+                      }`}
                   >
                     {scanResult.message}
                   </p>

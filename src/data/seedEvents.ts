@@ -7,7 +7,7 @@ export interface SeedEvent {
   venue: string | null;
   department: string | null;
   category: string | null;
-  status: "draft" | "pending" | "approved" | "rejected" | "completed";
+  status: "draft" | "pending" | "approved" | "rejected" | "completed" | "ongoing";
   max_participants: number | null;
   poster_url: string | null;
   organizer_id: string;
@@ -41,7 +41,7 @@ export const seedEvents: SeedEvent[] = [
     venue: "CMR Institute of Technology",
     department: "all",
     category: "Technical",
-    status: "approved",
+    status: "ongoing",
     max_participants: null,
     poster_url: null,
     organizer_id: "seed:gdg",

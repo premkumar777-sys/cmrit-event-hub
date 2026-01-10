@@ -11,6 +11,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import SettingsPage from "./pages/SettingsPage";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import FacultyDashboard from "./pages/FacultyDashboard";
+import ApproveEventsPage from "./pages/ApproveEventsPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CreateEventPage from "./pages/CreateEventPage";
 import QRScannerPage from "./pages/QRScannerPage";
@@ -113,6 +114,11 @@ const App = () => (
             <Route path="/approvals" element={
               <ProtectedRoute allowedRoles={['faculty', 'hod', 'admin']}>
                 <FacultyDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/approve-events" element={
+              <ProtectedRoute allowedRoles={['faculty', 'hod', 'admin']}>
+                <ApproveEventsPage />
               </ProtectedRoute>
             } />
 

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { GraduationCap, Users, BookOpen, Shield, Crown } from "lucide-react";
 
-type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin";
+type RoleType = "student" | "organizer" | "faculty" | "hod" | "admin" | "canteen_admin";
 
 interface RoleBadgeProps {
   role: RoleType;
@@ -35,12 +35,17 @@ const roleConfig: Record<RoleType, { label: string; icon: React.ComponentType<{ 
     icon: Shield,
     className: "bg-role-admin/10 text-role-admin border border-role-admin/20",
   },
+  canteen_admin: {
+    label: "Canteen Admin",
+    icon: Users, // Using Users as a fallback or import ChefHat if available
+    className: "bg-orange-500/10 text-orange-600 border border-orange-500/20",
+  },
 };
 
 export function RoleBadge({ role, className, showIcon = true }: RoleBadgeProps) {
   const config = roleConfig[role];
   const Icon = config.icon;
-  
+
   return (
     <span
       className={cn(

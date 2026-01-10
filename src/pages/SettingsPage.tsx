@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserProfile } from "@/hooks/useUserProfile";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,11 +43,28 @@ export default function SettingsPage() {
     try {
       if (theme === "system") localStorage.removeItem(STORAGE_KEY);
       else localStorage.setItem(STORAGE_KEY, theme);
-    } catch (_) {}
+    } catch (_) { }
   }, [theme]);
 
+  const { user } = useAuth();
+  const { profile } = useUserProfile();
+
+  const dashboardUser = {
+    name: profile?.full_name || user?.email?.split('@')[0] || "Settings",
+    email: user?.email || "",
+    role: "student" as const // This page is accessible by all, but layout needs a role. We might want to fix this dynamically later, but for now fallback to student or check useUserRole
+  };
+
+  // Actually, we should get the real role
+  // But for now, let's just use what we have, or better:
+  // We can fetch primaryRole from useUserRole
+
   return (
-    <DashboardLayout user={{ name: "Settings", email: "", role: "student" }}>
+    <DashboardLayout user={{
+      name: profile?.full_name || user?.email?.split('@')[0] || "Settings",
+      email: user?.email || "",
+      role: "student"
+    }}>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>

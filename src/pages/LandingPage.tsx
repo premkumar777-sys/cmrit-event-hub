@@ -128,7 +128,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-            <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 hero-gradient opacity-5 pointer-events-none" />
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
@@ -356,7 +356,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-8 border-t">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 CMR Institute of Technology. All rights reserved.</p>
+          <p>© 2026 Binary Brains for CMR Institute of Technology. All rights reserved.</p>
           <p className="mt-1">Powered by Google Cloud Technologies</p>
         </div>
       </footer>
