@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { StatsCard } from "@/components/StatsCard";
 import { EventCard } from "@/components/EventCard";
@@ -75,24 +76,51 @@ export default function StudentDashboard() {
           .order("date", { ascending: true });
 
         if (error) throw error;
-        setEvents(data || []);
+
+        // Merge local seed events in development so dev environment shows example events
+        let mergedEvents = data || [];
+        if (process.env.NODE_ENV === "development") {
+          try {
+            const seedModule = await import("@/data/seedEvents");
+            const seedEvents = seedModule.seedEvents || [];
+
+            const existingIds = new Set(mergedEvents.map((e: any) => e.id));
+            mergedEvents = [...mergedEvents, ...seedEvents.filter((s: any) => !existingIds.has(s.id)) as any[]];
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        setEvents(mergedEvents);
 
         // Fetch organizer names for each event
-        const organizerIds = [...new Set(data?.map((e) => e.organizer_id) || [])];
+        const organizerIds = [...new Set(mergedEvents?.map((e) => e.organizer_id) || [])];
+        let names: OrganizerInfo = {};
         if (organizerIds.length > 0) {
           const { data: profiles } = await supabase
             .from("profiles")
             .select("id, full_name, email")
             .in("id", organizerIds);
 
-          const names: OrganizerInfo = {};
           profiles?.forEach((p) => {
             // Extract club/organizer name from email or use full_name
             const emailPrefix = p.email.split("@")[0];
             names[p.id] = p.full_name || emailPrefix;
           });
-          setOrganizerNames(names);
         }
+
+        // Merge seed organizer names in development
+        if (process.env.NODE_ENV === "development") {
+          try {
+            const seedModule = await import("@/data/seedEvents");
+            const seedOrganizerNames = seedModule.seedOrganizerNames || {};
+            names = { ...names, ...seedOrganizerNames };
+          } catch (e) {
+            // ignore
+          }
+        }
+
+        setOrganizerNames(names);
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -124,10 +152,24 @@ export default function StudentDashboard() {
   }, [events]);
 
   const filteredEvents = events.filter(
-    (event) => selectedDept === "all" || event.department === selectedDept
+    (event) =>
+      selectedDept === "all" ||
+      event.department === selectedDept ||
+      // treat events with department 'all' or null as applicable to every department
+      event.department === "all" ||
+      event.department === null
   );
 
+  const navigate = useNavigate();
+
   const handleRegister = async (event: Event) => {
+    // If event has an external registration URL (seed events), open in new tab
+    const externalUrl = (event as any).register_url as string | undefined;
+    if (externalUrl) {
+      window.open(externalUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     const organizerName = organizerNames[event.organizer_id] || "Event Organizer";
     const result = await registerForEvent(event, organizerName);
     
@@ -155,6 +197,21 @@ export default function StudentDashboard() {
       userEmail: userProfile?.email || user?.email || "",
     });
     setTicketDialogOpen(true);
+  };
+
+  const handleViewDetails = (event: Event) => {
+    // For seed events, navigate to the corresponding club page and pass eventId in state so ClubPage can display full details
+    if ((event as any).organizer_id === "seed:fine-arts") {
+      navigate(`/clubs/fine-arts-club`, { state: { eventId: event.id } });
+      return;
+    }
+    if ((event as any).organizer_id === "seed:gdg") {
+      navigate(`/clubs/gdg`, { state: { eventId: event.id } });
+      return;
+    }
+
+    // Default behavior: open club page of organizer if we can resolve it; fallback to club listing
+    navigate("/clubs");
   };
 
   const userName = userProfile?.full_name || user?.email?.split("@")[0] || "Student";
@@ -239,7 +296,7 @@ export default function StudentDashboard() {
                   isRegistered={isRegistered(event.id)}
                   onRegister={() => handleRegister(event)}
                   onViewTicket={() => handleViewTicket(event)}
-                  onViewDetails={() => {}}
+                  onViewDetails={() => handleViewDetails(event)}
                 />
               </div>
             ))}

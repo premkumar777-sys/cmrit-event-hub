@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -85,7 +85,33 @@ export default function LandingPage() {
   const { signInWithGoogle } = useAuth();
   const { toast } = useToast();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [featuredByClub, setFeaturedByClub] = useState<Record<string, { title: string; date: string }[]>>({});
 
+  // Load seed events in development and map to clubs (so Fine Arts and GDG show featured events on home)
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "development") return;
+
+    (async () => {
+      try {
+        const seedModule = await import("@/data/seedEvents");
+        const seedEvents = seedModule.seedEvents || [];
+        const byClub: Record<string, { title: string; date: string }[]> = {};
+
+        seedEvents.forEach((ev: any) => {
+          clubs.forEach((club) => {
+            if ((club.id === "fine-arts-club" && ev.organizer_id === "seed:fine-arts") || (club.id === "gdg" && ev.organizer_id === "seed:gdg")) {
+              byClub[club.id] = byClub[club.id] || [];
+              byClub[club.id].push({ title: ev.title, date: ev.date });
+            }
+          });
+        });
+
+        setFeaturedByClub(byClub);
+      } catch (e) {
+        // ignore
+      }
+    })();
+  }, []);
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     const { error } = await signInWithGoogle();
@@ -235,6 +261,15 @@ export default function LandingPage() {
                     <Badge variant="secondary" className="mt-2 text-xs">
                       {club.category}
                     </Badge>
+
+                    {/* If there are featured seed events for this club (dev only), show a small snippet */}
+                    {featuredByClub[club.id]?.length > 0 && (
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          Upcoming: {featuredByClub[club.id][0].title} • {new Date(featuredByClub[club.id][0].date).toLocaleDateString()}
+                        </Badge>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               );
