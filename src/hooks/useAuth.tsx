@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { sendWelcomeEmail } from '@/utils/email';
 
 interface AuthContextType {
   user: User | null;
@@ -22,10 +23,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Send welcome email on first sign in
+        if (event === 'SIGNED_IN' && session?.user) {
+          const welcomeSentKey = `welcome_email_sent_${session.user.id}`;
+          const alreadySent = localStorage.getItem(welcomeSentKey);
+
+          console.log('Auth event:', event, 'Already sent:', alreadySent);
+
+          if (!alreadySent) {
+            const userName = session.user.user_metadata?.full_name ||
+              session.user.email?.split('@')[0] ||
+              'User';
+            console.log('Sending welcome email to:', session.user.email, userName);
+            try {
+              const result = await sendWelcomeEmail(session.user.email!, userName);
+              console.log('Email result:', result);
+              localStorage.setItem(welcomeSentKey, 'true');
+            } catch (err) {
+              console.error('Email send error:', err);
+            }
+          }
+        }
       }
     );
 
