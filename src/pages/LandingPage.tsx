@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { clubs } from "@/data/clubs";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useToast } from "@/hooks/use-toast";
 import {
   Calendar,
@@ -80,12 +81,33 @@ const roles = [
   },
 ];
 
+// Map roles to their dashboard routes
+const roleDashboardMap: Record<string, string> = {
+  'student': '/events',
+  'organizer': '/organizer',
+  'faculty': '/faculty',
+  'hod': '/faculty',
+  'admin': '/admin',
+  'canteen_admin': '/canteen/admin',
+};
+
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { primaryRole, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [featuredByClub, setFeaturedByClub] = useState<Record<string, { title: string; date: string }[]>>({});
+
+  // Redirect logged-in users to their dashboard
+  useEffect(() => {
+    if (authLoading || roleLoading) return;
+
+    if (user && primaryRole) {
+      const dashboard = roleDashboardMap[primaryRole] || '/events';
+      navigate(dashboard, { replace: true });
+    }
+  }, [user, primaryRole, authLoading, roleLoading, navigate]);
 
   // Load seed events in development and map to clubs (so Fine Arts and GDG show featured events on home)
   useEffect(() => {
