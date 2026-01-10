@@ -16,8 +16,6 @@ import CreateEventPage from "./pages/CreateEventPage";
 import QRScannerPage from "./pages/QRScannerPage";
 import CertificatesPage from "./pages/CertificatesPage";
 import CanteenMenuPage from "./pages/CanteenMenuPage";
-import CanteenAdminPage from "./pages/CanteenAdminPage";
-import CanteenScannerPage from "./pages/CanteenScannerPage";
 import ClubPage from "./pages/ClubPage";
 import NotFound from "./pages/NotFound";
 
@@ -117,17 +115,7 @@ const App = () => (
               </ProtectedRoute>
             } />
 
-            {/* Canteen Admin Routes */}
-            <Route path="/canteen/admin" element={
-              <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
-                <CanteenAdminPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/canteen/scanner" element={
-              <ProtectedRoute allowedRoles={['admin', 'canteen_admin']}>
-                <CanteenScannerPage />
-              </ProtectedRoute>
-            } />
+            {/* Canteen admin routes removed */}
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

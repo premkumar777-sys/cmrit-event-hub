@@ -106,12 +106,12 @@ export default function LandingPage() {
         <div className="absolute inset-0 hero-gradient opacity-5 pointer-events-none" />
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary text-primary-foreground font-bold text-2xl shadow-google">
-                C
+            <div className="flex flex-col items-center gap-2 mb-6">
+              <div className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-2xl text-primary-foreground font-bold text-3xl shadow-google overflow-hidden bg-transparent">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSr_iDKA9DXGdShzcH4PvKCcwg43ebAJI3JwQ&s" alt="CMRIT logo" className="w-full h-full object-contain" />
               </div>
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-foreground">CMRIT Events</h2>
+              <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">CMRIT Events</h2>
                 <p className="text-xs text-muted-foreground">Powered by Google</p>
               </div>
             </div>
