@@ -137,19 +137,23 @@ export default function LandingPage() {
                 <img src="/logos/logo.jpg" alt="CMRIT Logo" className="w-full h-full object-cover" />
               </div>
               <div className="text-left">
-                <h2 className="text-xl font-bold text-foreground">CMRIT Events</h2>
+                <h2 className="text-xl font-bold text-foreground">CMRIT</h2>
                 <p className="text-xs text-muted-foreground">Powered by Google</p>
               </div>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-              Smart Event &{" "}
-              <span className="text-primary">Approval System</span>
+              Explore to{" "}
+              <span className="text-primary">Invent</span>
             </h1>
 
+            <p className="text-2xl md:text-3xl font-medium text-muted-foreground mb-4 animate-fade-in">
+              Our Campus, Digitized
+            </p>
+
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl animate-slide-up">
-              Digitize event approvals, registrations, attendance, and certificates.
-              No more classroom disturbances or cabin visits.
+              Streamline campus operations, approvals, registrations, and digital services.
+              Your one-stop solution for all institutional activities.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up">
