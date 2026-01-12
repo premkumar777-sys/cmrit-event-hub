@@ -283,6 +283,82 @@ export default function FacultyDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Student Attendance Section */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary" />
+              Student Attendance Overview
+            </CardTitle>
+            <CardDescription>
+              View student attendance and identify students below 75% threshold
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="text-left p-3 font-semibold">Roll Number</th>
+                    <th className="text-left p-3 font-semibold">Student Name</th>
+                    <th className="text-left p-3 font-semibold">Branch</th>
+                    <th className="text-left p-3 font-semibold">Year</th>
+                    <th className="text-center p-3 font-semibold">Total Classes</th>
+                    <th className="text-center p-3 font-semibold">Attended</th>
+                    <th className="text-center p-3 font-semibold">Percentage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { rollNo: "24R01A66T7", name: "Prem Kumar", branch: "CSE-AI", year: "2nd", total: 120, attended: 108 },
+                    { rollNo: "24R01A66T8", name: "Harish Kumar", branch: "CSE-AI", year: "2nd", total: 120, attended: 115 },
+                    { rollNo: "24R01A66T9", name: "Karthik Reddy", branch: "CSE-AI", year: "2nd", total: 120, attended: 85 },
+                    { rollNo: "24R01A66K1", name: "Sai Krishna", branch: "CSE", year: "2nd", total: 120, attended: 102 },
+                    { rollNo: "24R01A66K2", name: "Priya Sharma", branch: "CSE", year: "2nd", total: 120, attended: 118 },
+                    { rollNo: "24R01A05M3", name: "Rahul Verma", branch: "ECE", year: "3rd", total: 110, attended: 78 },
+                    { rollNo: "24R01A05M4", name: "Sneha Reddy", branch: "ECE", year: "3rd", total: 110, attended: 105 },
+                    { rollNo: "24R01A04N5", name: "Anil Kumar", branch: "EEE", year: "3rd", total: 115, attended: 98 },
+                    { rollNo: "24R01A03P6", name: "Divya Lakshmi", branch: "MECH", year: "4th", total: 100, attended: 92 },
+                    { rollNo: "24R01A03P7", name: "Ravi Teja", branch: "MECH", year: "4th", total: 100, attended: 70 },
+                  ].map((student, index) => {
+                    const percentage = Math.round((student.attended / student.total) * 100);
+                    const isLow = percentage < 75;
+                    return (
+                      <tr key={index} className={`border-b hover:bg-muted/30 ${isLow ? 'bg-red-50 dark:bg-red-950/20' : ''}`}>
+                        <td className="p-3 font-mono text-xs">{student.rollNo}</td>
+                        <td className="p-3 font-medium">{student.name}</td>
+                        <td className="p-3">{student.branch}</td>
+                        <td className="p-3">{student.year}</td>
+                        <td className="p-3 text-center">{student.total}</td>
+                        <td className="p-3 text-center">{student.attended}</td>
+                        <td className="p-3 text-center">
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${percentage >= 85 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                              percentage >= 75 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                                'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                            }`}>
+                            {percentage}%
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-green-500" /> ≥85% (Excellent)
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-yellow-500" /> 75-84% (Good)
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-3 h-3 rounded-full bg-red-500" /> &lt;75% (Low)
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Approval Dialog */}

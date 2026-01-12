@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { clubs } from "@/data/clubs";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useToast } from "@/hooks/use-toast";
 import {
   Calendar,
@@ -80,12 +81,33 @@ const roles = [
   },
 ];
 
+// Map roles to their dashboard routes
+const roleDashboardMap: Record<string, string> = {
+  'student': '/events',
+  'organizer': '/organizer',
+  'faculty': '/faculty',
+  'hod': '/faculty',
+  'admin': '/admin',
+  'canteen_admin': '/canteen/admin',
+};
+
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { primaryRole, loading: roleLoading } = useUserRole();
   const { toast } = useToast();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [featuredByClub, setFeaturedByClub] = useState<Record<string, { title: string; date: string }[]>>({});
+
+  // Redirect logged-in users to their dashboard
+  useEffect(() => {
+    if (authLoading || roleLoading) return;
+
+    if (user && primaryRole) {
+      const dashboard = roleDashboardMap[primaryRole] || '/events';
+      navigate(dashboard, { replace: true });
+    }
+  }, [user, primaryRole, authLoading, roleLoading, navigate]);
 
   // Load seed events in development and map to clubs (so Fine Arts and GDG show featured events on home)
   useEffect(() => {
@@ -132,24 +154,37 @@ export default function LandingPage() {
         <div className="absolute inset-0 hero-gradient opacity-5 pointer-events-none" />
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl overflow-hidden shadow-google">
-                <img src="/logos/logo.jpg" alt="CMRIT Logo" className="w-full h-full object-cover" />
+            <div className="flex flex-col items-center gap-6 mb-12 animate-fade-in">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="flex items-center justify-center w-40 h-40 bg-white shadow-2xl transition-transform duration-500 hover:scale-105 z-10 relative">
+                  <img src="/logos/logo.jpg" alt="CMRIT Logo" className="w-full h-full object-contain p-2" />
+                </div>
               </div>
-              <div className="text-left">
-                <h2 className="text-xl font-bold text-foreground">CMRIT Events</h2>
-                <p className="text-xs text-muted-foreground">Powered by Google</p>
+              <div className="text-center space-y-2">
+                <h2 className="text-5xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+                  CMRIT
+                </h2>
+                <div className="flex items-center justify-center gap-2 text-muted-foreground font-medium">
+                  <span className="h-px w-8 bg-border" />
+                  <span className="tracking-widest uppercase text-sm">Powered by Google</span>
+                  <span className="h-px w-8 bg-border" />
+                </div>
               </div>
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 animate-fade-in">
-              Smart Event &{" "}
-              <span className="text-primary">Approval System</span>
+              Explore to{" "}
+              <span className="text-primary">Invent</span>
             </h1>
 
+            <p className="text-2xl md:text-3xl font-medium text-muted-foreground mb-4 animate-fade-in">
+              Our Campus, Digitized
+            </p>
+
             <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl animate-slide-up">
-              Digitize event approvals, registrations, attendance, and certificates.
-              No more classroom disturbances or cabin visits.
+              Streamline campus operations, approvals, registrations, and digital services.
+              Your one-stop solution for all institutional activities.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 animate-slide-up">
@@ -350,6 +385,61 @@ export default function LandingPage() {
             Sign in with College Email
             <ArrowRight className="w-4 h-4" />
           </Button>
+        </div>
+      </section>
+
+      {/* Campus Showcase Section */}
+      <section className="py-16 md:py-24 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Our Campus
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              CMR Institute of Technology - Where innovation meets excellence
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/main-building.jpg"
+                alt="CMRIT Main Building"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Main Building</h3>
+                <p className="text-sm text-white/80">Academic Block</p>
+              </div>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/building-side.jpg"
+                alt="CMRIT Campus View"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Campus View</h3>
+                <p className="text-sm text-white/80">Green Environment</p>
+              </div>
+            </div>
+
+            <div className="group relative overflow-hidden rounded-2xl shadow-google">
+              <img
+                src="/campus/lobby.jpg"
+                alt="CMRIT Reception"
+                className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <h3 className="font-semibold text-lg">Reception</h3>
+                <p className="text-sm text-white/80">Welcome Area</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
